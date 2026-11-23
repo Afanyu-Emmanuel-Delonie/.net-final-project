@@ -1,0 +1,20 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+## Logs
+*.log
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Amazon Q / AI tools
+.amazonq/
+.claude/
+**/.claude/
+**/claude*
+**/*claude*
