@@ -1,0 +1,123 @@
+@page
+@{
+	ViewData["Title"] = "Register a player";
+}
+
+<div class="staff-page-header">
+	<div>
+		<h2>Register a player</h2>
+		<p>Capture the player details and supporting documents for federation review.</p>
+	</div>
+	<a class="btn-ffms btn-ffms-outline" asp-page="/Staff/Dashboard">Back to dashboard</a>
+</div>
+
+<section class="staff-card" aria-labelledby="registration-form-title">
+	<div class="staff-card__header">
+		<h3 id="registration-form-title">Player registration details</h3>
+		<span class="staff-help"><span aria-hidden="true">*</span> Required fields</span>
+	</div>
+	<div class="staff-card__body">
+		<form method="post" enctype="multipart/form-data">
+			<div class="staff-form-section">
+				<h3>Personal details</h3>
+				<div class="row g-3">
+					<div class="col-md-6">
+						<label class="form-label" for="firstName">First name <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="firstName" name="FirstName" type="text" autocomplete="given-name" required aria-describedby="firstNameError" />
+						<div class="invalid-feedback d-block" id="firstNameError">First name is required.</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="lastName">Last name <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="lastName" name="LastName" type="text" autocomplete="family-name" required aria-describedby="lastNameError" />
+						<div class="invalid-feedback d-block" id="lastNameError">Last name is required.</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="dateOfBirth">Date of birth <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="dateOfBirth" name="DateOfBirth" type="date" required aria-describedby="dateOfBirthHelp" />
+						<div class="staff-help" id="dateOfBirthHelp">Use the date shown on the player’s identity document.</div>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="nationality">Nationality <span aria-hidden="true">*</span></label>
+						<select class="form-select" id="nationality" name="Nationality" required>
+							<option value="">Choose nationality</option>
+							<option selected>Rwandan</option>
+							<option>Ugandan</option>
+							<option>Tanzanian</option>
+							<option>Other</option>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="nationalId">National ID or passport number <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="nationalId" name="NationalId" type="text" required />
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="phone">Phone number</label>
+						<input class="form-control" id="phone" name="Phone" type="tel" autocomplete="tel" />
+					</div>
+				</div>
+			</div>
+
+			<div class="staff-form-section">
+				<h3>Football details</h3>
+				<div class="row g-3">
+					<div class="col-md-6">
+						<label class="form-label" for="club">Club <span aria-hidden="true">*</span></label>
+						<select class="form-select" id="club" name="Club" required>
+							<option value="">Choose club</option>
+							<option>APR FC</option>
+							<option>Rayon Sports</option>
+							<option>Police FC</option>
+							<option>Mukura VS</option>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="position">Position <span aria-hidden="true">*</span></label>
+						<select class="form-select" id="position" name="Position" required>
+							<option value="">Choose position</option>
+							<option>Goalkeeper</option>
+							<option>Defender</option>
+							<option>Midfielder</option>
+							<option>Forward</option>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="shirtNumber">Preferred shirt number</label>
+						<input class="form-control" id="shirtNumber" name="ShirtNumber" type="number" min="1" max="99" />
+					</div>
+					<div class="col-md-6">
+						<label class="form-label" for="registrationType">Registration type <span aria-hidden="true">*</span></label>
+						<select class="form-select" id="registrationType" name="RegistrationType" required>
+							<option value="">Choose type</option>
+							<option>New registration</option>
+							<option>Renewal</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="staff-form-section">
+				<h3>Supporting documents</h3>
+				<p class="staff-help">Upload PDF or image files. Each document should be clear and current.</p>
+				<div class="row g-3">
+					<div class="col-md-4">
+						<label class="form-label" for="contract">Player contract <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="contract" name="Contract" type="file" accept=".pdf,image/*" required />
+					</div>
+					<div class="col-md-4">
+						<label class="form-label" for="medicalReport">Medical report <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="medicalReport" name="MedicalReport" type="file" accept=".pdf,image/*" required />
+					</div>
+					<div class="col-md-4">
+						<label class="form-label" for="insurance">Insurance certificate <span aria-hidden="true">*</span></label>
+						<input class="form-control" id="insurance" name="Insurance" type="file" accept=".pdf,image/*" required />
+					</div>
+				</div>
+			</div>
+
+			<div class="staff-form-actions">
+				<a class="btn-ffms btn-ffms-outline" asp-page="/Staff/Dashboard">Cancel</a>
+				<button class="btn-ffms btn-ffms-green" type="submit">Save registration</button>
+			</div>
+		</form>
+	</div>
+</section>

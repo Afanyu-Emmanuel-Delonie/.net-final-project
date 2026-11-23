@@ -1,0 +1,133 @@
+@page
+@{
+	ViewData["Title"] = "Enter match result";
+}
+
+<div class="staff-page-header">
+	<div>
+		<h2>Enter match result</h2>
+		<p>Record the final score and match events for the fixture assigned to you.</p>
+	</div>
+	<span class="staff-status staff-status--pending">Result pending</span>
+</div>
+
+<form method="post">
+	<section class="staff-card mb-4" aria-labelledby="match-details-title">
+		<div class="staff-card__header">
+			<h3 id="match-details-title">Rayon Sports v Police FC</h3>
+			<span class="staff-help">Matchday 9 · 28 November 2026</span>
+		</div>
+		<div class="staff-card__body">
+			<p class="staff-help">Kigali Pelé Stadium · Kick-off 15:00 · Referee: Alice Mukamana</p>
+			<div class="row g-3 align-items-end mt-1">
+				<div class="col-6 col-md-4">
+					<label class="form-label" for="homeScore">Rayon Sports score <span aria-hidden="true">*</span></label>
+					<input class="form-control form-control-lg" id="homeScore" name="HomeScore" type="number" min="0" max="99" required />
+				</div>
+				<div class="col-6 col-md-4">
+					<label class="form-label" for="awayScore">Police FC score <span aria-hidden="true">*</span></label>
+					<input class="form-control form-control-lg" id="awayScore" name="AwayScore" type="number" min="0" max="99" required />
+				</div>
+				<div class="col-md-4">
+					<label class="form-label" for="matchStatus">Match status <span aria-hidden="true">*</span></label>
+					<select class="form-select form-select-lg" id="matchStatus" name="MatchStatus" required>
+						<option value="">Choose status</option>
+						<option>Completed</option>
+						<option>Abandoned</option>
+						<option>Postponed</option>
+					</select>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="staff-card" aria-labelledby="events-title">
+		<div class="staff-card__header">
+			<div>
+				<h3 id="events-title">Match events</h3>
+				<p class="staff-help mb-0">Add each event in the order it happened.</p>
+			</div>
+			<button class="btn btn-outline-primary" type="button">Add event</button>
+		</div>
+		<div class="staff-card__body">
+			<div class="staff-table-wrap">
+				<table class="table staff-table">
+					<caption class="visually-hidden">Match events to be recorded</caption>
+					<thead>
+						<tr>
+							<th scope="col">Minute</th>
+							<th scope="col">Event</th>
+							<th scope="col">Team</th>
+							<th scope="col">Player</th>
+							<th scope="col"><span class="visually-hidden">Action</span></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<label class="visually-hidden" for="eventMinute1">Minute for event 1</label>
+								<input class="form-control" id="eventMinute1" name="Events[0].Minute" type="number" min="1" max="120" placeholder="Min" />
+							</td>
+							<td>
+								<label class="visually-hidden" for="eventType1">Type for event 1</label>
+								<select class="form-select" id="eventType1" name="Events[0].Type">
+									<option value="">Choose event</option>
+									<option>Goal</option>
+									<option>Yellow card</option>
+									<option>Red card</option>
+									<option>Substitution</option>
+								</select>
+							</td>
+							<td>
+								<label class="visually-hidden" for="eventTeam1">Team for event 1</label>
+								<select class="form-select" id="eventTeam1" name="Events[0].Team">
+									<option value="">Choose team</option>
+									<option>Rayon Sports</option>
+									<option>Police FC</option>
+								</select>
+							</td>
+							<td>
+								<label class="visually-hidden" for="eventPlayer1">Player for event 1</label>
+								<input class="form-control" id="eventPlayer1" name="Events[0].Player" type="text" placeholder="Player name" />
+							</td>
+							<td><button class="btn btn-sm btn-outline-primary" type="button" aria-label="Remove event 1">Remove</button></td>
+						</tr>
+						<tr>
+							<td>
+								<label class="visually-hidden" for="eventMinute2">Minute for event 2</label>
+								<input class="form-control" id="eventMinute2" name="Events[1].Minute" type="number" min="1" max="120" placeholder="Min" />
+							</td>
+							<td>
+								<label class="visually-hidden" for="eventType2">Type for event 2</label>
+								<select class="form-select" id="eventType2" name="Events[1].Type">
+									<option value="">Choose event</option>
+									<option>Goal</option>
+									<option>Yellow card</option>
+									<option>Red card</option>
+									<option>Substitution</option>
+								</select>
+							</td>
+							<td>
+								<label class="visually-hidden" for="eventTeam2">Team for event 2</label>
+								<select class="form-select" id="eventTeam2" name="Events[1].Team">
+									<option value="">Choose team</option>
+									<option>Rayon Sports</option>
+									<option>Police FC</option>
+								</select>
+							</td>
+							<td>
+								<label class="visually-hidden" for="eventPlayer2">Player for event 2</label>
+								<input class="form-control" id="eventPlayer2" name="Events[1].Player" type="text" placeholder="Player name" />
+							</td>
+							<td><button class="btn btn-sm btn-outline-primary" type="button" aria-label="Remove event 2">Remove</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="staff-form-actions">
+				<button class="btn-ffms btn-ffms-outline" type="button">Save as draft</button>
+				<button class="btn-ffms btn-ffms-green" type="submit">Submit match result</button>
+			</div>
+		</div>
+	</section>
+</form>

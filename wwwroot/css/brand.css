@@ -1,0 +1,209 @@
+﻿/* FFMS brand tokens: Rwanda flag palette */
+:root {
+    --ffms-green: #0B6E4F;
+    --ffms-green-dark: #08543C;
+    --ffms-green-deep: #063F2D;
+    --ffms-sky: #00A1DE; /* accent: bars, flag band (not text) */
+    --ffms-sky-ink: #00729E; /* accent as text on white */
+    --ffms-sun: #FAD201;
+    --ffms-red: #B3261E; /* relegation / destructive status only */
+    --ffms-ink: #0F172A;
+    --ffms-muted: #475569;
+    --ffms-line: #DDE3E0;
+    --ffms-surface: #F6F8F7;
+    --ffms-white: #FFFFFF;
+    --ffms-font-display: "Poppins", "Segoe UI", system-ui, sans-serif;
+    --ffms-font-body: "Inter", "Segoe UI", system-ui, sans-serif;
+    --ffms-text-xs: 0.8rem;
+    --ffms-text-sm: 0.9rem;
+    --ffms-text-base: 1rem;
+    --ffms-text-lg: 1.25rem;
+    --ffms-text-xl: 1.563rem;
+    --ffms-text-2xl: 1.953rem;
+    --ffms-text-3xl: clamp(2.1rem, 4.5vw, 3.4rem);
+    --ffms-space-1: 0.5rem;
+    --ffms-space-2: 1rem;
+    --ffms-space-3: 1.5rem;
+    --ffms-space-4: 2rem;
+    --ffms-space-6: 3rem;
+    --ffms-space-8: 4rem;
+    --ffms-radius-sm: 6px;
+    --ffms-radius: 10px;
+    --ffms-container: 1160px;
+    /* Bootstrap overrides so later admin pages match the brand */
+    --bs-primary: var(--ffms-green);
+    --bs-primary-rgb: 11, 110, 79;
+    --bs-link-color: var(--ffms-sky-ink);
+    --bs-link-hover-color: var(--ffms-green);
+    --bs-body-font-family: var(--ffms-font-body);
+    --bs-body-color: var(--ffms-ink);
+    --bs-body-bg: var(--ffms-surface);
+    --bs-border-color: var(--ffms-line);
+    --bs-link-color-rgb: 0, 114, 158;
+    --bs-link-hover-color-rgb: 11, 110, 79;
+    --bs-secondary-color: var(--ffms-muted);
+}
+
+/* Bootstrap components use the FFMS design system. */
+.btn-primary {
+    --bs-btn-color: var(--ffms-white);
+    --bs-btn-bg: var(--ffms-green);
+    --bs-btn-border-color: var(--ffms-green);
+    --bs-btn-hover-color: var(--ffms-white);
+    --bs-btn-hover-bg: var(--ffms-green-dark);
+    --bs-btn-hover-border-color: var(--ffms-green-dark);
+    --bs-btn-active-bg: var(--ffms-green-deep);
+    --bs-btn-active-border-color: var(--ffms-green-deep);
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--ffms-green);
+    --bs-btn-border-color: var(--ffms-green);
+    --bs-btn-hover-color: var(--ffms-white);
+    --bs-btn-hover-bg: var(--ffms-green);
+    --bs-btn-hover-border-color: var(--ffms-green);
+    --bs-btn-active-color: var(--ffms-white);
+    --bs-btn-active-bg: var(--ffms-green-dark);
+    --bs-btn-active-border-color: var(--ffms-green-dark);
+}
+
+.nav-link {
+    color: var(--ffms-sky-ink);
+}
+
+.nav-link:hover,
+.nav-link:focus,
+.nav-link.active {
+    color: var(--ffms-green);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: var(--ffms-sky-ink);
+    box-shadow: 0 0 0 .25rem rgba(0, 161, 222, .2);
+}
+
+.form-check-input:checked {
+    background-color: var(--ffms-green);
+    border-color: var(--ffms-green);
+}
+
+.table {
+    --bs-table-color: var(--ffms-ink);
+    --bs-table-border-color: var(--ffms-line);
+}
+
+.table-primary {
+    --bs-table-bg: rgba(11, 110, 79, .1);
+    --bs-table-color: var(--ffms-ink);
+}
+
+/* Flag band: sky 50%, sun 25%, green 25% */
+.flag-band {
+    height: 6px;
+    background: linear-gradient(to right, var(--ffms-sky) 0 50%, var(--ffms-sun) 50% 75%, var(--ffms-green) 75% 100%);
+}
+
+.btn-ffms {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    padding: 0 1.4rem;
+    border-radius: var(--ffms-radius-sm);
+    font-family: var(--ffms-font-display);
+    font-weight: 600;
+    font-size: var(--ffms-text-base);
+    text-decoration: none;
+    border: 2px solid transparent;
+    transition: background-color .15s ease, color .15s ease, border-color .15s ease;
+    cursor: pointer;
+}
+
+.btn-ffms-primary {
+    background: var(--ffms-sun);
+    color: var(--ffms-ink);
+}
+
+    .btn-ffms-primary:hover {
+        background: #E6C000;
+        color: var(--ffms-ink);
+    }
+
+.btn-ffms-green {
+    background: var(--ffms-green);
+    color: var(--ffms-white);
+}
+
+    .btn-ffms-green:hover {
+        background: var(--ffms-green-dark);
+        color: var(--ffms-white);
+    }
+
+.btn-ffms-ghost {
+    border-color: rgba(255,255,255,.7);
+    color: var(--ffms-white);
+    background: transparent;
+}
+
+    .btn-ffms-ghost:hover {
+        background: rgba(255,255,255,.12);
+        color: var(--ffms-white);
+    }
+
+.btn-ffms-outline {
+    border-color: var(--ffms-green);
+    color: var(--ffms-green);
+    background: transparent;
+}
+
+    .btn-ffms-outline:hover {
+        background: var(--ffms-green);
+        color: var(--ffms-white);
+    }
+
+:focus-visible {
+    outline: 3px solid var(--ffms-sky-ink);
+    outline-offset: 3px;
+}
+
+.on-dark :focus-visible, .on-dark:focus-visible {
+    outline-color: var(--ffms-sun);
+}
+
+.score-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: .15rem .6rem;
+    border-radius: var(--ffms-radius-sm);
+    background: var(--ffms-sun);
+    color: var(--ffms-ink);
+    font-family: var(--ffms-font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.crest {
+    display: inline-grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    flex: none;
+    border-radius: 50%;
+    background: var(--ffms-white);
+    border: 2px solid var(--ffms-line);
+    color: var(--ffms-ink);
+    font-family: var(--ffms-font-display);
+    font-weight: 700;
+    font-size: .72rem;
+}
+
+.visually-hidden-focusable:not(:focus):not(:focus-within) {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+}

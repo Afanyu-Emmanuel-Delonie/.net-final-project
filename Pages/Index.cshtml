@@ -1,0 +1,200 @@
+﻿@page
+@model IndexModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Rwanda Premier League fixtures, results and standings";
+    ViewData["HasHero"] = true;
+    var s = Model.Snapshot;
+
+    var standings = s.Standings;
+    var topZoneSize = Math.Min(3, standings.Count);
+    var relegationZoneSize = standings.Count > topZoneSize ? Math.Min(3, standings.Count - topZoneSize) : 0;
+    var relegationStart = standings.Count - relegationZoneSize;
+}
+
+<section class="hero" aria-labelledby="hero-title">
+    <div class="hero__photo" aria-hidden="true"></div>
+    <div class="container-ffms hero__inner">
+        <p class="hero__season">Rwanda Premier League @s.SeasonName · after matchday @s.MatchdayPlayed</p>
+        <h1 id="hero-title">Every club and match, in one place.</h1>
+        <p class="hero__lede">Fixtures, results and the table, updated every matchday.</p>
+        <div class="hero__actions">
+            <a class="btn-ffms btn-ffms-primary" href="#standings">See the standings</a>
+            <a class="btn-ffms btn-ffms-ghost" href="/Account/Login">Get started</a>
+        </div>
+        <p class="hero__credit">Amahoro National Stadium, Kigali.</p>
+    </div>
+</section>
+
+<section id="results" class="section section--white" aria-labelledby="results-title">
+    <div class="container-ffms">
+        <div class="results-head">
+            <div>
+                <p class="results-head__eyebrow">Rwanda Premier League @s.SeasonName</p>
+                <h2 id="results-title">Matchday @s.MatchdayPlayed results</h2>
+            </div>
+        </div>
+
+        <ul class="scoreboard" role="list">
+            @foreach (var r in s.LatestResults)
+            {
+                <li class="scoreline">
+                    <span class="visually-hidden">@IndexModel.Outcome(r).</span>
+                    <div class="scoreline__team">
+                        <span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(r.Home.ShortCode)" aria-hidden="true">@r.Home.ShortCode</span>
+                        <span class="scoreline__name">@r.Home.Name</span>
+                    </div>
+                    <div class="scoreline__score" aria-label="@r.HomeGoals to @r.AwayGoals"><span>@r.HomeGoals</span><span class="scoreline__sep">–</span><span>@r.AwayGoals</span></div>
+                    <div class="scoreline__team scoreline__team--away">
+                        <span class="scoreline__name">@r.Away.Name</span>
+                        <span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(r.Away.ShortCode)" aria-hidden="true">@r.Away.ShortCode</span>
+                    </div>
+                    <div class="scoreline__meta">
+                        <span class="scoreline__status">Full-time</span>
+                        <span>@r.PlayedOn.ToString("ddd d MMM") · @r.Stadium</span>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</section>
+
+<section id="fixtures" class="section section--brand" aria-labelledby="fixtures-title">
+    <div class="container-ffms">
+        <div class="section__head section__head--on-brand">
+            <h2 id="fixtures-title">Upcoming fixtures</h2>
+            <a class="section__link section__link--on-brand" href="#fixtures">All fixtures</a>
+        </div>
+        <ol class="upcoming-grid" role="list">
+            @foreach (var f in s.UpcomingFixtures)
+            {
+                <li class="upcoming-card">
+                    <time class="upcoming-card__date">
+                        <span class="upcoming-card__day">@f.KickOff.ToString("ddd")</span>
+                        <span class="upcoming-card__num">@f.KickOff.Day</span>
+                        <span class="upcoming-card__mon">@f.KickOff.ToString("MMM")</span>
+                    </time>
+                    <div class="upcoming-card__body">
+                        <p class="upcoming-card__teams">@f.Home.Name <span class="upcoming-card__v">v</span> @f.Away.Name</p>
+                        <p class="upcoming-card__meta">@f.KickOff.ToString("HH:mm") · @f.Stadium</p>
+                    </div>
+                </li>
+            }
+        </ol>
+    </div>
+</section>
+
+<section class="section section--white" aria-label="Standings">
+    <div class="container-ffms">
+        <div id="standings" class="section__head"><h2>Standings</h2></div>
+        @if (relegationZoneSize > 0)
+        {
+            <ul class="standings-legend">
+                <li><span class="standings-legend__swatch standings-legend__swatch--top"></span>Top @topZoneSize · CAF qualification</li>
+                <li><span class="standings-legend__swatch standings-legend__swatch--relegation"></span>Bottom @relegationZoneSize · Relegation risk</li>
+            </ul>
+        }
+        <div class="table-wrap" role="region" aria-labelledby="standings-title" tabindex="0">
+            <table class="standings">
+                <caption class="visually-hidden">Rwanda Premier League @s.SeasonName standings, all @standings.Count clubs</caption>
+                <thead>
+                    <tr>
+                        <th scope="col"><abbr title="Position">#</abbr></th>
+                        <th scope="col" class="standings__club">Club</th>
+                        <th scope="col"><abbr title="Played">P</abbr></th>
+                        <th scope="col"><abbr title="Won">W</abbr></th>
+                        <th scope="col"><abbr title="Drawn">D</abbr></th>
+                        <th scope="col"><abbr title="Lost">L</abbr></th>
+                        <th scope="col" class="hide-sm"><abbr title="Goals for">GF</abbr></th>
+                        <th scope="col" class="hide-sm"><abbr title="Goals against">GA</abbr></th>
+                        <th scope="col"><abbr title="Goal difference">GD</abbr></th>
+                        <th scope="col"><abbr title="Points">Pts</abbr></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < standings.Count; i++)
+                    {
+                        var row = standings[i];
+                        var isTopZone = i < topZoneSize;
+                        var isRelegationZone = relegationZoneSize > 0 && i >= relegationStart;
+
+                        if (topZoneSize > 0 && i == topZoneSize)
+                        {
+                            <tr class="standings__divider"><td colspan="10">Continental qualification</td></tr>
+                        }
+                        if (relegationZoneSize > 0 && i == relegationStart && i != topZoneSize)
+                        {
+                            <tr class="standings__divider standings__divider--relegation"><td colspan="10">Relegation zone</td></tr>
+                        }
+                        <tr class="@(isTopZone ? "zone-top" : isRelegationZone ? "zone-relegation" : null) @(row.Position == 1 ? "is-leader" : null)">
+                            <td>@row.Position</td>
+                            <th scope="row" class="standings__club">
+                                <span class="club-cell">
+                                    <span class="crest" style="--crest-color:@ClubBrand.ColorFor(row.Club.ShortCode)" aria-hidden="true">@row.Club.ShortCode</span>
+                                    @row.Club.Name
+                                </span>
+                            </th>
+                            <td>@row.Played</td>
+                            <td>@row.Won</td>
+                            <td>@row.Drawn</td>
+                            <td>@row.Lost</td>
+                            <td class="hide-sm">@row.GoalsFor</td>
+                            <td class="hide-sm">@row.GoalsAgainst</td>
+                            <td>@(row.GoalDifference > 0 ? "+" : "")@row.GoalDifference</td>
+                            <td class="standings__pts">@row.Points</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="section" aria-labelledby="roles-title">
+    <div class="container-ffms">
+        <div class="roles-intro">
+            <p class="results-head__eyebrow">How FFMS works</p>
+            <h2 id="roles-title">One system for everyone who runs the season</h2>
+            <p>Each role signs in and sees only its own work. A club can't approve its own transfer, and a referee can't edit the table.</p>
+        </div>
+        <ul class="roles" role="list">
+            <li class="role role--green">
+                <span class="role__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 5v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5Z"/><path d="m9 12 2 2 4-4"/></svg>
+                </span>
+                <h3>FERWAFA</h3>
+                <p>Licenses clubs, approves player registrations and transfers, and sets the league rules.</p>
+            </li>
+            <li class="role role--sky">
+                <span class="role__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4h10v3a5 5 0 0 1-10 0V4Z"/><path d="M7 5H4v1a4 4 0 0 0 4 4"/><path d="M17 5h3v1a4 4 0 0 1-4 4"/><path d="M12 13v3"/><path d="M9 20h6"/><path d="M10 16h4l1 4H9l1-4Z"/></svg>
+                </span>
+                <h3>Rwanda Premier League</h3>
+                <p>Creates the season, schedules fixtures, assigns referees and publishes the table.</p>
+            </li>
+            <li class="role role--sun">
+                <span class="role__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 5 6v4h2v10h10V10h2V6l-3-3-3 2-3-2Z"/></svg>
+                </span>
+                <h3>Clubs</h3>
+                <p>Register players, request transfers and loans, and name the squad for each match.</p>
+            </li>
+            <li class="role role--ink">
+                <span class="role__icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="17" rx="2" transform="rotate(8 12 12)"/></svg>
+                </span>
+                <h3>Referees</h3>
+                <p>Enter the score, goals and cards after the final whistle. The table updates itself.</p>
+            </li>
+        </ul>
+
+        <div class="cta-banner">
+            <div class="cta-banner__copy">
+                <h3>Ready to run matchday?</h3>
+                <p>Staff sign in to register players, approve transfers and publish results.</p>
+            </div>
+            <a class="btn-ffms btn-ffms-primary" href="/Account/Login">Get started</a>
+        </div>
+    </div>
+</section>
+

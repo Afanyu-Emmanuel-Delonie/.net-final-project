@@ -1,0 +1,100 @@
+@page
+@model FERW.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = "Users and roles";
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Users</h2>
+        <p>Create accounts, assign roles, and link club managers to their club.</p>
+    </div>
+    <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#newUserModal">New user</button>
+</div>
+
+<section class="staff-card">
+    <div class="staff-table-wrap">
+        <table class="table staff-table">
+            <caption class="visually-hidden">Users and their assigned roles</caption>
+            <thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Role</th><th scope="col">Club</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+                @foreach (var u in Model.Workspace.Users)
+                {
+                    <tr>
+                        <th scope="row">@u.Name</th>
+                        <td>@u.Email</td>
+                        <td>@u.Role</td>
+                        <td>@(u.Club ?? "—")</td>
+                        <td><span class="staff-status @(u.Status == "Active" ? "staff-status--approved" : "staff-status--pending")">@u.Status</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div class="modal fade" id="newUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5">New user</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label" for="userName">Full name</label>
+                    <input class="form-control" id="userName" type="text" placeholder="Jean Claude Niyonzima" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="userEmail">Email address</label>
+                    <input class="form-control" id="userEmail" type="email" placeholder="name@ferwafa.rw" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="userRole">Role</label>
+                    <select class="form-select" id="userRole">
+                        @foreach (var role in FERW.Pages.Admin.Users.IndexModel.Roles)
+                        {
+                            <option>@role</option>
+                        }
+                    </select>
+                </div>
+                <div id="userClubField" hidden>
+                    <label class="form-label" for="userClub">Club</label>
+                    <select class="form-select" id="userClub">
+                        @foreach (var club in FERW.Pages.Admin.Users.IndexModel.Clubs)
+                        {
+                            <option>@club</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="createUserBtn" data-bs-dismiss="modal" disabled>Create user</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var roleSelect = document.getElementById('userRole');
+            var clubField = document.getElementById('userClubField');
+            var nameInput = document.getElementById('userName');
+            var emailInput = document.getElementById('userEmail');
+            var createBtn = document.getElementById('createUserBtn');
+            if (!roleSelect) return;
+
+            roleSelect.addEventListener('change', function () {
+                clubField.hidden = roleSelect.value !== 'Club manager';
+            });
+
+            function validate() {
+                createBtn.disabled = !(nameInput.value.trim() && emailInput.value.trim());
+            }
+            nameInput.addEventListener('input', validate);
+            emailInput.addEventListener('input', validate);
+        })();
+    </script>
+}

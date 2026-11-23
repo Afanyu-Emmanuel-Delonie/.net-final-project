@@ -1,0 +1,70 @@
+@page
+@model FERW.Pages.Admin.RulesModel
+@{
+    ViewData["Title"] = "League rules";
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>League rules</h2>
+        <p>These apply to every club and every match once saved. Changing one asks you to confirm first.</p>
+    </div>
+</div>
+
+<section class="staff-card">
+    <div class="staff-card__body">
+        <ul class="staff-list">
+            @foreach (var r in Model.Workspace.Rules)
+            {
+                <li class="staff-list__item">
+                    <div>
+                        <strong>@r.Label</strong>
+                        <small>@r.Help</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <span class="fs-4 fw-bold font-monospace">@r.Value</span>
+                        <button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#ruleModal"
+                                data-rule-label="@r.Label" data-rule-value="@r.Value">
+                            Edit
+                        </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+</section>
+
+<div class="modal fade" id="ruleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5">Change this rule?</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="ruleModalLabel" class="fw-semibold mb-2"></p>
+                <label class="form-label" for="ruleValue">New value</label>
+                <input class="form-control" id="ruleValue" type="number" min="0" />
+                <p class="staff-help mt-2 mb-0">This applies to future matches and decisions, not ones already approved.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save change</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var modalEl = document.getElementById('ruleModal');
+            if (!modalEl) return;
+            modalEl.addEventListener('show.bs.modal', function (event) {
+                var button = event.relatedTarget;
+                document.getElementById('ruleModalLabel').textContent = button.getAttribute('data-rule-label') || '';
+                document.getElementById('ruleValue').value = button.getAttribute('data-rule-value') || '';
+            });
+        })();
+    </script>
+}

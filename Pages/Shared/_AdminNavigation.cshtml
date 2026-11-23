@@ -1,0 +1,60 @@
+@inject FERW.Services.IAdminWorkspaceService WorkspaceService
+@{
+	var summary = (await WorkspaceService.GetWorkspaceAsync()).Summary;
+	var path = Context.Request.Path.Value ?? "";
+	string? ActiveIf(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) ? "page" : null;
+}
+<nav class="staff-nav" aria-label="Federation admin modules">
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Admin/Dashboard" aria-current="@ActiveIf("/Admin/Dashboard")">
+			<span aria-hidden="true">▦</span>
+			<span>Dashboard</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Admin/Approvals/Index" asp-route-tab="players" aria-current="@ActiveIf("/Admin/Approvals")">
+			<span aria-hidden="true">♙</span>
+			<span>Player registrations</span>
+			<span class="staff-nav__count">@summary.PendingRegistrations</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/Admin/Approvals/Index" asp-route-tab="transfers" aria-current="@ActiveIf("/Admin/Approvals")">
+			<span aria-hidden="true">⇄</span>
+			<span>Transfers</span>
+			<span class="staff-nav__count">@summary.PendingTransfers</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Admin/Licensing/Index" aria-current="@ActiveIf("/Admin/Licensing")">
+			<span aria-hidden="true">◉</span>
+			<span>Club licensing</span>
+			<span class="staff-nav__count">@summary.PendingLicenses</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Admin/Windows/Index" aria-current="@ActiveIf("/Admin/Windows")">
+			<span aria-hidden="true">▤</span>
+			<span>Registration windows</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/Admin/Rules" aria-current="@ActiveIf("/Admin/Rules")">
+			<span aria-hidden="true">⚙</span>
+			<span>League rules</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Admin/Users/Index" aria-current="@ActiveIf("/Admin/Users")">
+			<span aria-hidden="true">⚉</span>
+			<span>Users and roles</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__footer">
+		<a class="staff-nav__link" href="#sign-out">
+			<span aria-hidden="true">→</span>
+			<span>Sign out</span>
+		</a>
+	</div>
+</nav>

@@ -1,0 +1,115 @@
+@page
+@model FERW.Pages.Admin.Licensing.IndexModel
+@{
+    ViewData["Title"] = "Club licensing";
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Club licensing</h2>
+        <p>Review each club's documents and set this season's license status.</p>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-5">
+        <div class="staff-card">
+            <div class="staff-table-wrap">
+                <table class="table staff-table">
+                    <caption class="visually-hidden">Clubs and their license status this season</caption>
+                    <thead><tr><th scope="col">Club</th><th scope="col">Season</th><th scope="col">Status</th></tr></thead>
+                    <tbody>
+                        @foreach (var c in Model.Workspace.Licenses)
+                        {
+                            <tr class="@(Model.SelectedClub?.Id == c.Id ? "table-active" : "")">
+                                <td>
+                                    <a asp-page="/Admin/Licensing/Index" asp-route-id="@c.Id" class="text-decoration-none">
+                                        <strong>@c.Club</strong>
+                                    </a>
+                                </td>
+                                <td>@c.Season</td>
+                                <td><span class="staff-status @FERW.Pages.Admin.Licensing.IndexModel.BadgeClass(c.Status)">@c.Status</span></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        @{ var c2 = Model.SelectedClub; }
+        @if (c2 is null)
+        {
+            <div class="staff-card"><div class="staff-empty"><strong>Select a club</strong>Pick a club from the list to review its license documents.</div></div>
+        }
+        else
+        {
+            <article class="staff-card">
+                <div class="staff-card__header">
+                    <div>
+                        <h3 class="mb-0">@c2.Club</h3>
+                        <span class="staff-help">@c2.Season season</span>
+                    </div>
+                    <span class="staff-status @FERW.Pages.Admin.Licensing.IndexModel.BadgeClass(c2.Status)">@c2.Status</span>
+                </div>
+                <div class="staff-card__body">
+                    <h4 class="staff-eyebrow">Documents</h4>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-md-3"><div class="border rounded p-2"><strong class="d-block small">Ground safety certificate</strong><span class="staff-status @(c2.HasGroundCert ? "staff-status--approved" : "staff-status--rejected")">@(c2.HasGroundCert ? "Uploaded" : "Missing")</span></div></div>
+                        <div class="col-6 col-md-3"><div class="border rounded p-2"><strong class="d-block small">Financial statement</strong><span class="staff-status @(c2.HasFinancials ? "staff-status--approved" : "staff-status--rejected")">@(c2.HasFinancials ? "Uploaded" : "Missing")</span></div></div>
+                        <div class="col-6 col-md-3"><div class="border rounded p-2"><strong class="d-block small">Insurance document</strong><span class="staff-status @(c2.HasInsurance ? "staff-status--approved" : "staff-status--rejected")">@(c2.HasInsurance ? "Uploaded" : "Missing")</span></div></div>
+                        <div class="col-6 col-md-3"><div class="border rounded p-2"><strong class="d-block small">Stadium inspection report</strong><span class="staff-status @(c2.HasInspection ? "staff-status--approved" : "staff-status--rejected")">@(c2.HasInspection ? "Uploaded" : "Missing")</span></div></div>
+                    </div>
+
+                    <h4 class="staff-eyebrow">License decision</h4>
+                    <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#licenseDecisionModal">Set license status</button>
+                </div>
+            </article>
+
+            <div class="modal fade" id="licenseDecisionModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header"><h2 class="modal-title fs-5">License decision for @c2.Club</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                        <div class="modal-body">
+                            <label class="form-label" for="licenseStatus">Status</label>
+                            <select class="form-select mb-3" id="licenseStatus">
+                                @foreach (var s in FERW.Pages.Admin.Licensing.IndexModel.StatusOptions)
+                                {
+                                    <option selected="@(s == c2.Status)">@s</option>
+                                }
+                            </select>
+                            <div id="fineField" class="mb-3" hidden="@(c2.Status != "Licensed with fine")">
+                                <label class="form-label" for="fineAmount">Fine amount (RWF)</label>
+                                <input class="form-control" id="fineAmount" type="number" min="0" step="1000" value="@c2.FineRwf" />
+                            </div>
+                            <div id="reasonField" hidden="@(c2.Status != "Rejected")">
+                                <label class="form-label" for="licenseRejectReason">Reason</label>
+                                <textarea class="form-control" id="licenseRejectReason" rows="3" placeholder="e.g. Stadium inspection report is missing.">@c2.RejectionReason</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save decision</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var statusSelect = document.getElementById('licenseStatus');
+            if (!statusSelect) return;
+            var fineField = document.getElementById('fineField');
+            var reasonField = document.getElementById('reasonField');
+            statusSelect.addEventListener('change', function () {
+                fineField.hidden = statusSelect.value !== 'Licensed with fine';
+                reasonField.hidden = statusSelect.value !== 'Rejected';
+            });
+        })();
+    </script>
+}

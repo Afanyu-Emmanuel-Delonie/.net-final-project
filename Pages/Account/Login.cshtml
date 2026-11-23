@@ -1,0 +1,36 @@
+@page
+@model FERW.Pages.Account.LoginModel
+@{
+    ViewData["Title"] = "Staff sign in";
+}
+
+<div class="auth-shell">
+    <partial name="_AuthVisual" model="@("Every club, player and match in Rwandan football, in one place.")" />
+    <div class="auth-form-panel">
+        <div class="auth-card">
+            <a class="auth-back" asp-page="/Index">← Back to FFMS</a>
+            <h1>Staff sign in</h1>
+            <p class="auth-card__subtitle">Sign in to register players, approve transfers and run matchday.</p>
+
+            <form method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-field">
+                    <label asp-for="Input.Email">Email address</label>
+                    <input asp-for="Input.Email" autocomplete="email" placeholder="you@ferwafa.rw" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Input.Password">Password</label>
+                    <input asp-for="Input.Password" autocomplete="current-password" placeholder="••••••••" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="auth-row-split">
+                    <label class="auth-check"><input asp-for="Input.RememberMe" /> Remember me</label>
+                    <a asp-page="/Account/ForgotPassword">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn-ffms btn-ffms-green auth-submit">Sign in</button>
+            </form>
+            <p class="auth-switch">Need an account? <a asp-page="/Account/Register">Request staff access</a></p>
+        </div>
+    </div>
+</div>

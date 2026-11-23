@@ -1,0 +1,100 @@
+@page
+@{
+	ViewData["Title"] = "Clubs";
+}
+
+<div class="staff-page-header">
+	<div>
+		<h2>Clubs</h2>
+		<p>Manage club profiles, contacts, stadiums, and annual licensing status.</p>
+	</div>
+	<button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#addClubModal">Add club</button>
+</div>
+
+<section class="staff-card" aria-labelledby="clubs-table-title">
+	<div class="staff-card__header">
+		<h3 id="clubs-table-title">Registered clubs <span class="staff-help">(16)</span></h3>
+		<form class="d-flex gap-2" role="search">
+			<label class="visually-hidden" for="clubSearch">Search clubs</label>
+			<input class="form-control" id="clubSearch" name="q" type="search" placeholder="Search clubs" />
+			<button class="btn btn-outline-primary" type="submit">Search</button>
+		</form>
+	</div>
+	<div class="staff-table-wrap">
+		<table class="table staff-table">
+			<caption class="visually-hidden">Registered clubs and their license status</caption>
+			<thead>
+				<tr>
+					<th scope="col">Club</th>
+					<th scope="col">City</th>
+					<th scope="col">Stadium</th>
+					<th scope="col">License status</th>
+					<th scope="col"><span class="visually-hidden">Actions</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row"><span class="staff-table__club"><span class="crest" aria-hidden="true">APR</span> APR FC</span></th>
+					<td>Kigali</td>
+					<td>U Amahoro Stadium</td>
+					<td><span class="staff-status staff-status--licensed">Licensed</span></td>
+					<td><a class="btn btn-sm btn-outline-primary" href="#apr-fc">View club</a></td>
+				</tr>
+				<tr>
+					<th scope="row"><span class="staff-table__club"><span class="crest" aria-hidden="true">RAY</span> Rayon Sports</span></th>
+					<td>Nyanza</td>
+					<td>Kigali Pelé Stadium</td>
+					<td><span class="staff-status staff-status--licensed">Licensed</span></td>
+					<td><a class="btn btn-sm btn-outline-primary" href="#rayon-sports">View club</a></td>
+				</tr>
+				<tr>
+					<th scope="row"><span class="staff-table__club"><span class="crest" aria-hidden="true">POL</span> Police FC</span></th>
+					<td>Kigali</td>
+					<td>Kigali Pelé Stadium</td>
+					<td><span class="staff-status staff-status--pending">Pending</span></td>
+					<td><a class="btn btn-sm btn-outline-primary" href="#police-fc">View club</a></td>
+				</tr>
+				<tr>
+					<th scope="row"><span class="staff-table__club"><span class="crest" aria-hidden="true">MUK</span> Mukura VS</span></th>
+					<td>Huye</td>
+					<td>Huye Stadium</td>
+					<td><span class="staff-status staff-status--licensed">Licensed</span></td>
+					<td><a class="btn btn-sm btn-outline-primary" href="#mukura-vs">View club</a></td>
+				</tr>
+				<tr>
+					<th scope="row"><span class="staff-table__club"><span class="crest" aria-hidden="true">ETI</span> Etincelles FC</span></th>
+					<td>Rubavu</td>
+					<td>Umuganda Stadium</td>
+					<td><span class="staff-status staff-status--rejected">Rejected</span></td>
+					<td><a class="btn btn-sm btn-outline-primary" href="#etincelles-fc">View club</a></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+
+<div class="modal fade" id="addClubModal" tabindex="-1" aria-labelledby="addClubModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title fs-5" id="addClubModalLabel">Add club</h2>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p class="staff-help">Add club is a placeholder for the club setup workflow.</p>
+				<div class="mb-3">
+					<label class="form-label" for="newClubName">Club name</label>
+					<input class="form-control" id="newClubName" type="text" />
+				</div>
+				<div>
+					<label class="form-label" for="newClubCity">City</label>
+					<input class="form-control" id="newClubCity" type="text" />
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn-ffms btn-ffms-green">Save club</button>
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,78 @@
+@page
+@model FERW.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Request staff access";
+}
+
+<div class="auth-shell">
+    <partial name="_AuthVisual" model="@("Each role signs in and sees only its own work.")" />
+    <div class="auth-form-panel">
+        <div class="auth-card">
+            <a class="auth-back" asp-page="/Account/Login">← Back to sign in</a>
+            <h1>Request staff access</h1>
+            <p class="auth-card__subtitle">Tell us who you are. FERWAFA reviews every request before it's approved.</p>
+
+            <form method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-field">
+                    <label asp-for="Input.Name">Full name</label>
+                    <input asp-for="Input.Name" autocomplete="name" placeholder="Jean Claude Niyonzima" />
+                    <span asp-validation-for="Input.Name" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Input.Email">Email address</label>
+                    <input asp-for="Input.Email" autocomplete="email" placeholder="you@club.rw" />
+                    <span asp-validation-for="Input.Email" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Input.Role">Role</label>
+                    <select asp-for="Input.Role" id="reg-role">
+                        <option value="">Select a role</option>
+                        <option value="federation">FERWAFA staff</option>
+                        <option value="league">Rwanda Premier League staff</option>
+                        <option value="club">Club staff</option>
+                        <option value="referee">Referee</option>
+                    </select>
+                    <span asp-validation-for="Input.Role" class="text-danger"></span>
+                </div>
+                <div class="form-field" id="reg-club-field" hidden="@(Model.Input.Role != "club")">
+                    <label asp-for="Input.Club">Club</label>
+                    <select asp-for="Input.Club">
+                        <option value="">Select a club</option>
+                        @foreach (var club in FERW.Pages.Account.RegisterModel.Clubs)
+                        {
+                            <option>@club</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Input.Password">Password</label>
+                    <input asp-for="Input.Password" autocomplete="new-password" placeholder="At least 8 characters" />
+                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                </div>
+                <div class="form-field">
+                    <label asp-for="Input.Password2">Confirm password</label>
+                    <input asp-for="Input.Password2" autocomplete="new-password" placeholder="Re-enter your password" />
+                    <span asp-validation-for="Input.Password2" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn-ffms btn-ffms-green auth-submit">Create account</button>
+            </form>
+            <p class="auth-note">Your account needs approval from FERWAFA before you can sign in. This usually takes one working day.</p>
+            <p class="auth-switch">Already have an account? <a asp-page="/Account/Login">Sign in</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var role = document.getElementById('reg-role');
+            var clubField = document.getElementById('reg-club-field');
+            if (role && clubField) {
+                role.addEventListener('change', function () {
+                    clubField.hidden = role.value !== 'club';
+                });
+            }
+        })();
+    </script>
+}

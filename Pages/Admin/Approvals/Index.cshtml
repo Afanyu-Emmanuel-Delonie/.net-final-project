@@ -1,0 +1,338 @@
+@page
+@model FERW.Pages.Admin.Approvals.IndexModel
+@{
+    ViewData["Title"] = "Approval queue";
+    var clubs = Model.Workspace.Registrations.Select(r => r.Club).Distinct().OrderBy(c => c).ToList();
+    var windows = Model.Workspace.Windows.Select(w => w.Category).ToList();
+}
+
+<ul class="nav nav-tabs mb-3" id="approvalTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @(Model.Tab == "players" ? "active" : "")" id="players-tab" data-bs-toggle="tab" data-bs-target="#players-pane" type="button" role="tab" aria-selected="@(Model.Tab == "players")">
+            Player registrations <span class="staff-help">(@Model.Workspace.Registrations.Count(r => r.Status == "Pending"))</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link @(Model.Tab == "transfers" ? "active" : "")" id="transfers-tab" data-bs-toggle="tab" data-bs-target="#transfers-pane" type="button" role="tab" aria-selected="@(Model.Tab == "transfers")">
+            Transfers <span class="staff-help">(@Model.Workspace.Transfers.Count(t => t.Status == "Pending"))</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- PLAYERS -->
+    <div class="tab-pane fade @(Model.Tab == "players" ? "show active" : "")" id="players-pane" role="tabpanel" tabindex="0">
+        <form method="get" class="row g-2 align-items-end mb-3">
+            <input type="hidden" name="tab" value="players" />
+            <div class="col-auto">
+                <label class="form-label" for="f-club">Club</label>
+                <select class="form-select" id="f-club" name="club">
+                    <option value="">All clubs</option>
+                    @foreach (var c in clubs)
+                    {
+                        <option value="@c" selected="@(c == Model.Club)">@c</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="f-window">Window</label>
+                <select class="form-select" id="f-window" name="window">
+                    <option value="">All windows</option>
+                    @foreach (var w in windows)
+                    {
+                        <option value="@w" selected="@(w == Model.Window)">@w</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="f-status">Status</label>
+                <select class="form-select" id="f-status" name="status">
+                    <option value="">All statuses</option>
+                    <option selected="@(Model.Status == "Pending")">Pending</option>
+                    <option selected="@(Model.Status == "Approved")">Approved</option>
+                    <option selected="@(Model.Status == "Rejected")">Rejected</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <label class="form-label" for="f-search">Search</label>
+                <input class="form-control" id="f-search" type="search" name="search" value="@Model.Search" placeholder="Player name" />
+            </div>
+            <div class="col-auto">
+                <button class="btn-ffms btn-ffms-outline" type="submit">Filter</button>
+            </div>
+        </form>
+
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="staff-card">
+                    @if (Model.FilteredRegistrations.Count == 0)
+                    {
+                        <div class="staff-empty">
+                            <strong>No registrations match these filters.</strong>
+                            Clear a filter, or check back after the window opens.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="staff-table-wrap">
+                            <table class="table staff-table">
+                                <caption class="visually-hidden">Pending player registrations</caption>
+                                <thead><tr><th scope="col">Player</th><th scope="col">Window</th><th scope="col">Status</th></tr></thead>
+                                <tbody>
+                                    @foreach (var r in Model.FilteredRegistrations)
+                                    {
+                                        <tr class="@(Model.SelectedRegistration?.Id == r.Id ? "table-active" : "")">
+                                            <td>
+                                                <a asp-page="/Admin/Approvals/Index" asp-route-tab="players" asp-route-id="@r.Id" class="text-decoration-none">
+                                                    <strong class="d-block">@r.PlayerName</strong>
+                                                    <small class="staff-help">@r.Club</small>
+                                                </a>
+                                            </td>
+                                            <td>@r.Window</td>
+                                            <td><span class="staff-status staff-status--pending">@r.Status</span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                @{ var p = Model.SelectedRegistration; }
+                @if (p is null)
+                {
+                    <div class="staff-card"><div class="staff-empty"><strong>Select a registration</strong>Pick a player from the list to review their documents.</div></div>
+                }
+                else
+                {
+                    var docsComplete = FERW.Pages.Admin.Approvals.IndexModel.DocsComplete(p);
+                    var canApprove = FERW.Pages.Admin.Approvals.IndexModel.CanApprove(p);
+                    <article class="staff-card">
+                        <div class="staff-card__header">
+                            <div>
+                                <h3 class="mb-0">@p.PlayerName</h3>
+                                <span class="staff-help">@p.Club · @p.Position · born @p.DateOfBirth@(p.IsForeign ? " · Foreign player" : "")</span>
+                            </div>
+                            <span class="staff-status staff-status--pending">@p.Status</span>
+                        </div>
+                        <div class="staff-card__body">
+                            <h4 class="staff-eyebrow">Documents</h4>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6 col-md-4">
+                                    <div class="border rounded p-2"><strong class="d-block small">Signed contract</strong><span class="staff-status @(p.HasContract ? "staff-status--approved" : "staff-status--rejected")">@(p.HasContract ? "Uploaded" : "Missing")</span></div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="border rounded p-2"><strong class="d-block small">Medical report</strong><span class="staff-status @(p.HasMedical ? "staff-status--approved" : "staff-status--rejected")">@(p.HasMedical ? "Uploaded" : "Missing")</span></div>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <div class="border rounded p-2"><strong class="d-block small">Insurance document</strong><span class="staff-status @(p.HasInsurance ? "staff-status--approved" : "staff-status--rejected")">@(p.HasInsurance ? "Uploaded" : "Missing")</span></div>
+                                </div>
+                            </div>
+
+                            <h4 class="staff-eyebrow">Rule checks</h4>
+                            <ul class="check-list mb-3">
+                                <li class="check-list__item">
+                                    <span class="check-list__mark @(docsComplete ? "check-list__mark--pass" : "check-list__mark--fail")">@(docsComplete ? "✓" : "✕")</span>
+                                    <span>
+                                        Documents complete
+                                        @if (!docsComplete)
+                                        {
+                                            <span class="check-list__why">Missing: @string.Join(", ", new[] { (!p.HasContract, "signed contract"), (!p.HasMedical, "medical report"), (!p.HasInsurance, "insurance document") }.Where(x => x.Item1).Select(x => x.Item2))</span>
+                                        }
+                                    </span>
+                                </li>
+                                <li class="check-list__item">
+                                    <span class="check-list__mark check-list__mark--pass">✓</span>
+                                    <span>@p.Window window is open</span>
+                                </li>
+                                @if (p.IsForeign)
+                                {
+                                    <li class="check-list__item">
+                                        <span class="check-list__mark @(p.FeePaid == true ? "check-list__mark--pass" : "check-list__mark--fail")">@(p.FeePaid == true ? "✓" : "✕")</span>
+                                        <span>
+                                            Foreign-player fee paid
+                                            @if (p.FeePaid != true)
+                                            {
+                                                <span class="check-list__why">Fee not yet received</span>
+                                            }
+                                        </span>
+                                    </li>
+                                }
+                            </ul>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#approvePlayerModal" @(canApprove ? "" : "disabled")>Approve registration</button>
+                                <button class="btn-ffms btn-ffms-outline" type="button" data-bs-toggle="modal" data-bs-target="#rejectPlayerModal">Reject registration</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="modal fade" id="approvePlayerModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header"><h2 class="modal-title fs-5">Approve this registration?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                                <div class="modal-body"><p class="mb-0">This issues a license number for @p.PlayerName.</p></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Approve registration</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="rejectPlayerModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header"><h2 class="modal-title fs-5">Reject this registration?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                                <div class="modal-body">
+                                    <p>@p.PlayerName and @p.Club will see this reason.</p>
+                                    <label class="form-label" for="playerRejectReason">Reason for rejection</label>
+                                    <textarea class="form-control" id="playerRejectReason" rows="3" required></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="confirmRejectPlayer" disabled>Reject registration</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- TRANSFERS -->
+    <div class="tab-pane fade @(Model.Tab == "transfers" ? "show active" : "")" id="transfers-pane" role="tabpanel" tabindex="0">
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="staff-card">
+                    <div class="staff-table-wrap">
+                        <table class="table staff-table">
+                            <caption class="visually-hidden">Pending transfer requests</caption>
+                            <thead><tr><th scope="col">Player</th><th scope="col">From → To</th><th scope="col">Status</th></tr></thead>
+                            <tbody>
+                                @foreach (var t in Model.Workspace.Transfers)
+                                {
+                                    <tr class="@(Model.SelectedTransfer?.Id == t.Id ? "table-active" : "")">
+                                        <td>
+                                            <a asp-page="/Admin/Approvals/Index" asp-route-tab="transfers" asp-route-id="@t.Id" class="text-decoration-none">
+                                                <strong class="d-block">@t.PlayerName</strong>
+                                                <small class="staff-help">@t.Kind</small>
+                                            </a>
+                                        </td>
+                                        <td>@t.FromClub → @t.ToClub</td>
+                                        <td><span class="staff-status staff-status--pending">@t.Status</span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                @{ var t2 = Model.SelectedTransfer; }
+                @if (t2 is null)
+                {
+                    <div class="staff-card"><div class="staff-empty"><strong>Select a transfer</strong>Pick a request from the list to review the loan-limit checks.</div></div>
+                }
+                else
+                {
+                    var isLoan = FERW.Pages.Admin.Approvals.IndexModel.IsLoan(t2);
+                    var canApproveTransfer = FERW.Pages.Admin.Approvals.IndexModel.CanApprove(t2);
+                    <article class="staff-card">
+                        <div class="staff-card__header">
+                            <div>
+                                <h3 class="mb-0">@t2.PlayerName</h3>
+                                <span class="staff-help">@t2.FromClub → @t2.ToClub · @t2.Kind</span>
+                            </div>
+                            <span class="staff-status staff-status--pending">@t2.Status</span>
+                        </div>
+                        <div class="staff-card__body">
+                            <h4 class="staff-eyebrow">Rule checks</h4>
+                            <ul class="check-list mb-3">
+                                <li class="check-list__item">
+                                    <span class="check-list__mark @(t2.ReleaseAccepted ? "check-list__mark--pass" : "check-list__mark--fail")">@(t2.ReleaseAccepted ? "✓" : "✕")</span>
+                                    <span>
+                                        Releasing club has accepted
+                                        @if (!t2.ReleaseAccepted)
+                                        {
+                                            <span class="check-list__why">@t2.FromClub has not accepted the release yet</span>
+                                        }
+                                    </span>
+                                </li>
+                                @if (isLoan)
+                                {
+                                    <li class="check-list__item">
+                                        <span class="check-list__mark @(t2.ClubLoanCount <= 6 ? "check-list__mark--pass" : "check-list__mark--fail")">@(t2.ClubLoanCount <= 6 ? "✓" : "✕")</span>
+                                        <span>@t2.ToClub is under the 6-loan limit @(t2.ClubLoanCount > 6 ? $"({t2.ToClub} already has {t2.ClubLoanCount} loans this season)" : "")</span>
+                                    </li>
+                                    <li class="check-list__item">
+                                        <span class="check-list__mark @(t2.SameClubLoanCount <= 3 ? "check-list__mark--pass" : "check-list__mark--fail")">@(t2.SameClubLoanCount <= 3 ? "✓" : "✕")</span>
+                                        <span>At most 3 loans from @t2.FromClub</span>
+                                    </li>
+                                    <li class="check-list__item">
+                                        <span class="check-list__mark @(t2.LoanMonths is <= 12 ? "check-list__mark--pass" : "check-list__mark--fail")">@(t2.LoanMonths is <= 12 ? "✓" : "✕")</span>
+                                        <span>Loan is 1 year or less @(t2.LoanMonths is > 12 ? $"({t2.LoanMonths} months exceeds the limit)" : "")</span>
+                                    </li>
+                                }
+                            </ul>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#approveTransferModal" @(canApproveTransfer ? "" : "disabled")>Approve @(isLoan ? "loan" : "transfer")</button>
+                                <button class="btn-ffms btn-ffms-outline" type="button" data-bs-toggle="modal" data-bs-target="#rejectTransferModal">Reject</button>
+                            </div>
+                        </div>
+                    </article>
+
+                    <div class="modal fade" id="approveTransferModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header"><h2 class="modal-title fs-5">Approve this @(isLoan ? "loan" : "transfer")?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                                <div class="modal-body"><p class="mb-0">@t2.PlayerName moves from @t2.FromClub to @t2.ToClub.</p></div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Approve</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="rejectTransferModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header"><h2 class="modal-title fs-5">Reject this request?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+                                <div class="modal-body">
+                                    <p>@t2.PlayerName and both clubs will see this reason.</p>
+                                    <label class="form-label" for="transferRejectReason">Reason for rejection</label>
+                                    <textarea class="form-control" id="transferRejectReason" rows="3" required></textarea>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="confirmRejectTransfer" disabled>Reject</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            function wireReasonGate(textareaId, buttonId) {
+                var textarea = document.getElementById(textareaId);
+                var button = document.getElementById(buttonId);
+                if (!textarea || !button) return;
+                textarea.addEventListener('input', function () {
+                    button.disabled = textarea.value.trim().length === 0;
+                });
+            }
+            wireReasonGate('playerRejectReason', 'confirmRejectPlayer');
+            wireReasonGate('transferRejectReason', 'confirmRejectTransfer');
+        })();
+    </script>
+}

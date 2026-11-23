@@ -1,0 +1,58 @@
+<nav class="staff-nav" aria-label="Staff modules">
+	<div class="staff-nav__group">
+		<p class="staff-nav__label">Overview</p>
+		<a class="staff-nav__link" asp-page="/Staff/Dashboard">
+			<span aria-hidden="true">▦</span>
+			<span>Dashboard</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<p class="staff-nav__label">Competition</p>
+		<a class="staff-nav__link" asp-page="/Staff/Clubs/Index">
+			<span aria-hidden="true">◉</span>
+			<span>Clubs</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/Staff/Players/Register">
+			<span aria-hidden="true">♙</span>
+			<span>Players</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/Staff/Transfers/Index">
+			<span aria-hidden="true">⇄</span>
+			<span>Transfers</span>
+			<span class="staff-nav__count">4</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/Staff/Matches/Result">
+			<span aria-hidden="true">▣</span>
+			<span>Matches</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<p class="staff-nav__label">Administration</p>
+		<a class="staff-nav__link" href="#registrations">
+			<span aria-hidden="true">▤</span>
+			<span>Registrations</span>
+			<span class="staff-nav__count">7</span>
+		</a>
+		<a class="staff-nav__link" href="#reports">
+			<span aria-hidden="true">▥</span>
+			<span>Reports</span>
+		</a>
+		<a class="staff-nav__link" href="#users">
+			<span aria-hidden="true">♙</span>
+			<span>Users and rules</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__footer">
+		<a class="staff-nav__link" asp-page="/Index">
+			<span aria-hidden="true">↩</span>
+			<span>View public site</span>
+		</a>
+		<a class="staff-nav__link" href="#sign-out">
+			<span aria-hidden="true">→</span>
+			<span>Sign out</span>
+		</a>
+	</div>
+</nav>

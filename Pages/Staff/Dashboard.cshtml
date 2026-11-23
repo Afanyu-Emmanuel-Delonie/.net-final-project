@@ -1,0 +1,123 @@
+@page
+@{
+	ViewData["Title"] = "Dashboard";
+}
+
+<div class="staff-page-header">
+	<div>
+		<h2>Good morning, Jean Claude</h2>
+		<p>Here is what needs your attention across the current Rwanda Premier League season.</p>
+	</div>
+	<a class="btn-ffms btn-ffms-green" asp-page="/Staff/Matches/Result">Enter a match result</a>
+</div>
+
+<section aria-labelledby="summary-title" class="mb-4">
+	<h3 id="summary-title" class="visually-hidden">Season summary</h3>
+	<div class="row g-3">
+		<div class="col-6 col-xl-3">
+			<article class="staff-card staff-stat">
+				<p class="staff-stat__label">Licensed clubs</p>
+				<p class="staff-stat__value">16</p>
+				<span class="staff-help">12 in the Premier League</span>
+			</article>
+		</div>
+		<div class="col-6 col-xl-3">
+			<article class="staff-card staff-stat">
+				<p class="staff-stat__label">Registered players</p>
+				<p class="staff-stat__value">384</p>
+				<span class="staff-help">18 added this month</span>
+			</article>
+		</div>
+		<div class="col-6 col-xl-3">
+			<article class="staff-card staff-stat">
+				<p class="staff-stat__label">Pending registrations</p>
+				<p class="staff-stat__value">7</p>
+				<span class="staff-help">Oldest request: 2 days</span>
+			</article>
+		</div>
+		<div class="col-6 col-xl-3">
+			<article class="staff-card staff-stat">
+				<p class="staff-stat__label">Pending transfers</p>
+				<p class="staff-stat__value">4</p>
+				<span class="staff-help">2 need your review</span>
+			</article>
+		</div>
+	</div>
+</section>
+
+<div class="row g-4">
+	<section class="col-xl-7" aria-labelledby="approval-title">
+		<article class="staff-card">
+			<div class="staff-card__header">
+				<h3 id="approval-title">Waiting for approval</h3>
+				<a class="section__link" href="#all-approvals">View all</a>
+			</div>
+			<div class="staff-card__body">
+				<ul class="staff-list">
+					<li class="staff-list__item">
+						<div>
+							<strong>Player registration</strong>
+							<small>Eric Mugisha · APR FC · Submitted today</small>
+						</div>
+						<span class="staff-status staff-status--pending">Pending</span>
+					</li>
+					<li class="staff-list__item">
+						<div>
+							<strong>Transfer request</strong>
+							<small>Claude Bizimana · Rayon Sports to Police FC</small>
+						</div>
+						<span class="staff-status staff-status--pending">Pending</span>
+					</li>
+					<li class="staff-list__item">
+						<div>
+							<strong>Club license renewal</strong>
+							<small>Etincelles FC · Submitted 1 day ago</small>
+						</div>
+						<span class="staff-status staff-status--pending">Pending</span>
+					</li>
+					<li class="staff-list__item">
+						<div>
+							<strong>Player registration</strong>
+							<small>Divine Uwamahoro · Mukura VS · Submitted 2 days ago</small>
+						</div>
+						<span class="staff-status staff-status--pending">Pending</span>
+					</li>
+				</ul>
+			</div>
+		</article>
+	</section>
+
+	<section class="col-xl-5" aria-labelledby="fixtures-title">
+		<article class="staff-card">
+			<div class="staff-card__header">
+				<h3 id="fixtures-title">Next fixtures</h3>
+				<a class="section__link" href="#all-fixtures">View calendar</a>
+			</div>
+			<div class="staff-card__body">
+				<ul class="staff-list">
+					<li class="staff-list__item">
+						<div>
+							<strong>Rayon Sports v Police FC</strong>
+							<small>Saturday, 28 November · 15:00 · Kigali Pelé Stadium</small>
+						</div>
+						<span class="crest" aria-hidden="true">RAY</span>
+					</li>
+					<li class="staff-list__item">
+						<div>
+							<strong>Mukura VS v APR FC</strong>
+							<small>Saturday, 28 November · 15:00 · Huye Stadium</small>
+						</div>
+						<span class="crest" aria-hidden="true">MUK</span>
+					</li>
+					<li class="staff-list__item">
+						<div>
+							<strong>Etincelles FC v Marines FC</strong>
+							<small>Sunday, 29 November · 15:00 · Umuganda Stadium</small>
+						</div>
+						<span class="crest" aria-hidden="true">ETI</span>
+					</li>
+				</ul>
+			</div>
+		</article>
+	</section>
+</div>

@@ -1,0 +1,123 @@
+@page
+@{
+	ViewData["Title"] = "Transfers";
+}
+
+<div class="staff-page-header">
+	<div>
+		<h2>Transfers</h2>
+		<p>Review player movements between registered clubs and record the next action.</p>
+	</div>
+	<button class="btn-ffms btn-ffms-outline" type="button" data-bs-toggle="modal" data-bs-target="#transferRulesModal">View transfer rules</button>
+</div>
+
+<section class="staff-card" aria-labelledby="transfers-table-title">
+	<div class="staff-card__header">
+		<h3 id="transfers-table-title">Transfer requests <span class="staff-help">(8)</span></h3>
+		<div class="d-flex flex-wrap gap-2" aria-label="Transfer status legend">
+			<span class="staff-status staff-status--pending">Pending</span>
+			<span class="staff-status staff-status--approved">Approved</span>
+		</div>
+	</div>
+	<div class="staff-table-wrap">
+		<table class="table staff-table">
+			<caption class="visually-hidden">Transfer requests and their current status</caption>
+			<thead>
+				<tr>
+					<th scope="col">Player</th>
+					<th scope="col">From</th>
+					<th scope="col">To</th>
+					<th scope="col">Requested</th>
+					<th scope="col">Status</th>
+					<th scope="col"><span class="visually-hidden">Actions</span></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row">Claude Bizimana</th>
+					<td>Rayon Sports</td>
+					<td>Police FC</td>
+					<td>24 Nov 2026</td>
+					<td><span class="staff-status staff-status--pending">Requested</span></td>
+					<td>
+						<div class="d-flex flex-wrap gap-2">
+							<button class="btn btn-sm btn-primary" type="button">Approve transfer</button>
+							<button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#rejectTransferModal">Reject transfer</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Samuel Tuyisenge</th>
+					<td>APR FC</td>
+					<td>Marines FC</td>
+					<td>23 Nov 2026</td>
+					<td><span class="staff-status staff-status--pending">Requested</span></td>
+					<td>
+						<div class="d-flex flex-wrap gap-2">
+							<button class="btn btn-sm btn-primary" type="button">Approve transfer</button>
+							<button class="btn btn-sm btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#rejectTransferModal">Reject transfer</button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">Eric Mugenzi</th>
+					<td>Police FC</td>
+					<td>Gicumbi FC</td>
+					<td>20 Nov 2026</td>
+					<td><span class="staff-status staff-status--approved">Approved</span></td>
+					<td><span class="staff-help">Awaiting registration</span></td>
+				</tr>
+				<tr>
+					<th scope="row">David Nshimiyimana</th>
+					<td>Kiyovu SC</td>
+					<td>Etincelles FC</td>
+					<td>18 Nov 2026</td>
+					<td><span class="staff-status staff-status--rejected">Rejected</span></td>
+					<td><span class="staff-help">Documents incomplete</span></td>
+				</tr>
+				<tr>
+					<th scope="row">Patrick Habimana</th>
+					<td>Mukura VS</td>
+					<td>Rayon Sports</td>
+					<td>12 Nov 2026</td>
+					<td><span class="staff-status staff-status--completed">Completed</span></td>
+					<td><span class="staff-help">Registered 16 Nov</span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</section>
+
+<div class="modal fade" id="rejectTransferModal" tabindex="-1" aria-labelledby="rejectTransferModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title fs-5" id="rejectTransferModalLabel">Reject transfer</h2>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<label class="form-label" for="rejectionReason">Reason for rejection</label>
+				<textarea class="form-control" id="rejectionReason" rows="4" required></textarea>
+				<div class="staff-help mt-2">The reason will be visible to both clubs.</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary">Reject transfer</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="transferRulesModal" tabindex="-1" aria-labelledby="transferRulesModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title fs-5" id="transferRulesModalLabel">Transfer rules</h2>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<p>Both clubs must confirm the request before federation approval. A complete contract and medical clearance are required before registration.</p>
+			</div>
+		</div>
+	</div>
+</div>

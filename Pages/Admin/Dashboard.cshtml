@@ -1,0 +1,119 @@
+@page
+@model FERW.Pages.Admin.DashboardModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var s = Model.Workspace.Summary;
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Good morning, Jean Claude</h2>
+        <p>Here is what needs your attention across the current Rwanda Premier League season.</p>
+    </div>
+    <a class="btn-ffms btn-ffms-green" asp-page="/Admin/Approvals/Index" asp-route-tab="players">Open approval queue</a>
+</div>
+
+<section aria-labelledby="summary-title" class="mb-4">
+    <h3 id="summary-title" class="visually-hidden">Season summary</h3>
+    <div class="row g-3">
+        <div class="col-6 col-xl-3">
+            <article class="staff-card staff-stat">
+                <p class="staff-stat__label">Pending registrations</p>
+                <p class="staff-stat__value">@s.PendingRegistrations</p>
+                <span class="staff-help">Oldest waiting: @s.OldestRegistrationWait days</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="staff-card staff-stat">
+                <p class="staff-stat__label">Pending transfers</p>
+                <p class="staff-stat__value">@s.PendingTransfers</p>
+                <span class="staff-help">Oldest waiting: @s.OldestTransferWait days</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="staff-card staff-stat">
+                <p class="staff-stat__label">Pending licenses</p>
+                <p class="staff-stat__value">@s.PendingLicenses</p>
+                <span class="staff-help">Oldest waiting: @s.OldestLicenseWait days</span>
+            </article>
+        </div>
+        <div class="col-6 col-xl-3">
+            <article class="staff-card staff-stat">
+                <p class="staff-stat__label">Licensed clubs</p>
+                <p class="staff-stat__value">@s.LicensedClubs</p>
+                <span class="staff-help">of @s.TotalClubs this season</span>
+            </article>
+        </div>
+    </div>
+</section>
+
+<div class="row g-4">
+    <section class="col-xl-7" aria-labelledby="approval-title">
+        <article class="staff-card">
+            <div class="staff-card__header">
+                <h3 id="approval-title">Waiting for approval</h3>
+                <a class="section__link" asp-page="/Admin/Approvals/Index" asp-route-tab="players">View all</a>
+            </div>
+            <div class="staff-card__body">
+                <ul class="staff-list">
+                    @foreach (var r in Model.Workspace.Registrations.Where(r => r.Status == "Pending").Take(4))
+                    {
+                        <li class="staff-list__item">
+                            <div>
+                                <strong>Player registration</strong>
+                                <small>@r.PlayerName · @r.Club · waiting @r.Waiting</small>
+                            </div>
+                            <span class="staff-status staff-status--pending">Pending</span>
+                        </li>
+                    }
+                    @foreach (var t in Model.Workspace.Transfers.Where(t => t.Status == "Pending").Take(2))
+                    {
+                        <li class="staff-list__item">
+                            <div>
+                                <strong>Transfer request</strong>
+                                <small>@t.PlayerName · @t.FromClub to @t.ToClub</small>
+                            </div>
+                            <span class="staff-status staff-status--pending">Pending</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </article>
+    </section>
+
+    <div class="col-xl-5" style="display:grid; gap:1.5rem;">
+        <article class="staff-card" aria-labelledby="windows-title">
+            <div class="staff-card__header">
+                <h3 id="windows-title">Open registration windows</h3>
+                <a class="section__link" asp-page="/Admin/Windows/Index">Manage</a>
+            </div>
+            <div class="staff-card__body">
+                <ul class="staff-list">
+                    @foreach (var w in Model.Workspace.Windows)
+                    {
+                        <li class="staff-list__item">
+                            <div>
+                                <strong>@w.Category</strong>
+                                <small>@(w.Status == "Open" ? $"Closes {w.Closes}" : $"Closed {w.Closes}")</small>
+                            </div>
+                            <span class="staff-status @(w.Status == "Open" ? "staff-status--approved" : "staff-status--completed")">@w.Status</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </article>
+
+        <article class="staff-card" aria-labelledby="activity-title">
+            <div class="staff-card__header">
+                <h3 id="activity-title">Recent activity</h3>
+            </div>
+            <div class="staff-card__body">
+                <ul class="staff-list">
+                    <li class="staff-list__item"><div><strong>Licensed</strong><small>Marines FC · 2026/27 season</small></div><span class="staff-status staff-status--licensed">Licensed</span></li>
+                    <li class="staff-list__item"><div><strong>Approved transfer</strong><small>Samuel Nkurunziza · Gicumbi FC to Kiyovu SC</small></div><span class="staff-status staff-status--approved">Approved</span></li>
+                    <li class="staff-list__item"><div><strong>Rejected registration</strong><small>Patrick Habimana · missing medical report</small></div><span class="staff-status staff-status--rejected">Rejected</span></li>
+                </ul>
+            </div>
+        </article>
+    </div>
+</div>
