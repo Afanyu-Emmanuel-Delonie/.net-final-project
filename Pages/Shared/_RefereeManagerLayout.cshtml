@@ -1,0 +1,78 @@
+@{
+	var pageTitle = ViewData["Title"] as string ?? "Referee manager";
+	var userName = "Patrick Sendegeya";
+	var userRole = "Referee manager";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@pageTitle | FFMS referee manager</title>
+	<link rel="icon" type="image/svg+xml" href="~/image/logo-mark.svg" />
+	<link rel="preconnect" href="https://fonts.googleapis.com" />
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/brand.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/css/staff.css" asp-append-version="true" />
+	@await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="staff-body">
+	<a class="skip-link visually-hidden-focusable" href="#referee-manager-main">Skip to main content</a>
+
+	<div class="staff-shell">
+		<aside class="staff-sidebar" aria-label="Referee manager navigation">
+			<div class="staff-sidebar__brand">
+				<a class="staff-brand" asp-page="/Index" aria-label="FFMS home">
+					<img src="~/image/logo-mark.svg" alt="" width="34" height="39" />
+					<span>
+						<strong>FFMS</strong>
+						<small>Referee manager</small>
+					</span>
+				</a>
+			</div>
+			<partial name="_RefereeManagerNavigation" />
+		</aside>
+
+		<div class="staff-content">
+			<header class="staff-topbar">
+				<button class="btn staff-menu-toggle" type="button" data-bs-toggle="offcanvas" data-bs-target="#referee-manager-menu" aria-controls="referee-manager-menu">
+					<span class="staff-menu-toggle__icon" aria-hidden="true">☰</span>
+					<span>Menu</span>
+				</button>
+				<div class="staff-topbar__title">
+					<p class="staff-eyebrow">FFMS referee manager</p>
+					<h1>@pageTitle</h1>
+				</div>
+				<div class="staff-user" aria-label="Signed-in user">
+					<span class="staff-user__avatar" aria-hidden="true">PS</span>
+					<span class="staff-user__details">
+						<strong>@userName</strong>
+						<small>@userRole</small>
+					</span>
+				</div>
+			</header>
+
+			<main id="referee-manager-main" class="staff-main" tabindex="-1">
+				@RenderBody()
+			</main>
+		</div>
+	</div>
+
+	<div class="offcanvas offcanvas-start staff-offcanvas" tabindex="-1" id="referee-manager-menu" aria-labelledby="referee-manager-menu-title">
+		<div class="offcanvas-header">
+			<h2 class="offcanvas-title" id="referee-manager-menu-title">FFMS referee manager menu</h2>
+			<button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close menu"></button>
+		</div>
+		<div class="offcanvas-body">
+			<partial name="_RefereeManagerNavigation" />
+		</div>
+	</div>
+
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

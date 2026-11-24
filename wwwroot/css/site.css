@@ -1045,3 +1045,76 @@ body.has-hero .site-header:not(.is-scrolled) .site-header__cta:hover {
     color: var(--ffms-ink);
     font-size: .82rem;
 }
+
+.demo-accounts {
+    margin-top: var(--ffms-space-4);
+    padding-top: var(--ffms-space-3);
+    border-top: 1px solid var(--ffms-line);
+}
+
+.demo-accounts__title {
+    margin: 0 0 .2rem;
+    color: var(--ffms-ink);
+    font-family: var(--ffms-font-display);
+    font-size: .95rem;
+    font-weight: 700;
+}
+
+.demo-accounts__hint {
+    margin: 0 0 var(--ffms-space-2);
+    color: var(--ffms-muted);
+    font-size: .82rem;
+}
+
+.demo-account {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    padding: .6rem 0;
+    border-bottom: 1px solid var(--ffms-line);
+}
+
+.demo-account:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.demo-avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--ffms-green);
+    color: var(--ffms-white);
+    font-family: var(--ffms-font-display);
+    font-size: .74rem;
+    font-weight: 700;
+}
+
+.demo-account__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.demo-account__body strong,
+.demo-account__body small {
+    display: block;
+}
+
+.demo-account__body strong {
+    font-size: .88rem;
+}
+
+.demo-account__body small {
+    color: var(--ffms-muted);
+    font-size: .76rem;
+}
+
+.demo-account .btn-ffms {
+    flex: none;
+    min-height: 38px;
+    padding: 0 1rem;
+    font-size: .82rem;
+}

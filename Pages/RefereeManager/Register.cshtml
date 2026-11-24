@@ -1,0 +1,125 @@
+@page
+@model FERW.Pages.RefereeManager.RegisterModel
+@{
+    ViewData["Title"] = "Register a referee";
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Register a referee</h2>
+        <p>Add a new match official to the FFMS roster.</p>
+    </div>
+</div>
+
+<section class="staff-card">
+    <div class="staff-card__body">
+        <div class="stepper" id="stepper">
+            <div class="stepper__step is-active" data-step="1"><span class="stepper__num">1</span><span class="stepper__label">Details</span></div>
+            <div class="stepper__line"></div>
+            <div class="stepper__step" data-step="2"><span class="stepper__num">2</span><span class="stepper__label">Certification &amp; documents</span></div>
+            <div class="stepper__line"></div>
+            <div class="stepper__step" data-step="3"><span class="stepper__num">3</span><span class="stepper__label">Review &amp; submit</span></div>
+        </div>
+
+        <form method="post">
+            <div class="step-panel" data-panel="1">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="refName">Full name</label>
+                        <input class="form-control" id="refName" name="refName" placeholder="e.g. Grace Umutoni" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="refDob">Date of birth</label>
+                        <input class="form-control" id="refDob" name="refDob" type="date" />
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="refPhone">Phone</label>
+                        <input class="form-control" id="refPhone" name="refPhone" placeholder="+250 7__ ___ ___" />
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="refEmail">Email</label>
+                        <input class="form-control" id="refEmail" name="refEmail" type="email" placeholder="name@ferwafa.rw" />
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="refRegion">Home region</label>
+                    <input class="form-control" id="refRegion" name="refRegion" placeholder="e.g. Kigali" />
+                </div>
+            </div>
+
+            <div class="step-panel" data-panel="2" hidden>
+                <div class="mb-3">
+                    <label class="form-label" for="refCert">Certification level</label>
+                    <select class="form-select" id="refCert" name="refCert">
+                        <option>Regional</option>
+                        <option selected>National</option>
+                        <option>FIFA-listed</option>
+                    </select>
+                </div>
+                <p class="staff-help mb-2">All three documents are required before this referee can be assigned to a match.</p>
+                <ul class="check-list">
+                    <li class="check-list__item"><span class="check-list__mark check-list__mark--pass">✓</span>
+                        <div class="check-list__body"><strong>Referee certification</strong><span class="check-list__why">Uploaded</span></div>
+                        <button type="button" class="btn-ffms btn-ffms-outline btn-ffms-sm">Replace</button></li>
+                    <li class="check-list__item"><span class="check-list__mark check-list__mark--pass">✓</span>
+                        <div class="check-list__body"><strong>National ID</strong><span class="check-list__why">Uploaded</span></div>
+                        <button type="button" class="btn-ffms btn-ffms-outline btn-ffms-sm">Replace</button></li>
+                    <li class="check-list__item"><span class="check-list__mark check-list__mark--fail">!</span>
+                        <div class="check-list__body"><strong>Medical clearance</strong><span class="check-list__why">Not uploaded yet — required to continue</span></div>
+                        <button type="button" class="btn-ffms btn-ffms-outline btn-ffms-sm">Upload</button></li>
+                </ul>
+                <div class="upload-box mt-3"><strong>Choose a file</strong> or drag it here — PDF, JPG or PNG, under 5MB</div>
+            </div>
+
+            <div class="step-panel" data-panel="3" hidden>
+                <p class="staff-help mb-3">Check everything below before adding this referee to the roster.</p>
+                <ul class="staff-list" style="border:1px solid var(--ffms-line);border-radius:var(--ffms-radius-sm);padding:.25rem 1rem;">
+                    <li class="staff-list__item"><span>Name</span><strong id="reviewName">—</strong></li>
+                    <li class="staff-list__item"><span>Certification</span><strong id="reviewCert">—</strong></li>
+                    <li class="staff-list__item"><span>Home region</span><strong id="reviewRegion">—</strong></li>
+                    <li class="staff-list__item"><span>Documents</span><strong>2 of 3 uploaded</strong></li>
+                </ul>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn-ffms btn-ffms-outline" id="prevStep" disabled>Back</button>
+                <button type="button" class="btn-ffms btn-ffms-green" id="nextStep">Continue</button>
+            </div>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        (function () {
+            var curStep = 1;
+            var panels = document.querySelectorAll('.step-panel');
+            var prevBtn = document.getElementById('prevStep');
+            var nextBtn = document.getElementById('nextStep');
+
+            function render() {
+                document.querySelectorAll('.stepper__step').forEach(function (s) {
+                    var n = +s.getAttribute('data-step');
+                    s.classList.remove('is-active', 'is-done');
+                    if (n === curStep) s.classList.add('is-active');
+                    else if (n < curStep) s.classList.add('is-done');
+                });
+                panels.forEach(function (p) { p.hidden = +p.getAttribute('data-panel') !== curStep; });
+                prevBtn.disabled = curStep === 1;
+                nextBtn.textContent = curStep === 3 ? 'Add to roster' : 'Continue';
+                if (curStep === 3) {
+                    document.getElementById('reviewName').textContent = document.getElementById('refName').value || '—';
+                    document.getElementById('reviewCert').textContent = document.getElementById('refCert').value;
+                    document.getElementById('reviewRegion').textContent = document.getElementById('refRegion').value || '—';
+                }
+            }
+            nextBtn.addEventListener('click', function () {
+                if (curStep < 3) { curStep++; render(); }
+                else { alert('Demo only — this referee would be added to the roster here.'); }
+            });
+            prevBtn.addEventListener('click', function () { if (curStep > 1) { curStep--; render(); } });
+        })();
+    </script>
+}

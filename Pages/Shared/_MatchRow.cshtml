@@ -1,0 +1,37 @@
+@using FERW.Services
+@model MatchRecord
+@{
+    var m = Model;
+    var statusClass = m.Status switch
+    {
+        "Scheduled" => "staff-status--scheduled",
+        "In play" => "staff-status--inplay",
+        "Finished" => "staff-status--approved",
+        "Result pending" => "staff-status--completed",
+        "Postponed" => "staff-status--rejected",
+        _ => "staff-status--pending",
+    };
+}
+<a class="match-row" asp-page="/League/Match/Detail" asp-route-id="@m.Id">
+    <div class="match-row__team">
+        <span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(m.HomeCode)" aria-hidden="true">@m.HomeCode</span>
+        <span class="match-row__name">@ClubBrand.NameFor(m.HomeCode)</span>
+    </div>
+    <div class="match-row__score">@(m.Score ?? "v")</div>
+    <div class="match-row__team match-row__team--away">
+        <span class="match-row__name">@ClubBrand.NameFor(m.AwayCode)</span>
+        <span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(m.AwayCode)" aria-hidden="true">@m.AwayCode</span>
+    </div>
+    <div class="match-row__meta">
+        <span class="staff-status @statusClass">@m.Status</span>
+        <span class="match-row__when">@m.DisplayTime@(m.Referee is null ? "" : " · " + m.Referee)</span>
+        <span class="match-row__squads">
+            <span class="staff-status @(m.SquadHome ? "staff-status--approved" : "staff-status--rejected")">@ClubBrand.NameFor(m.HomeCode).Split(' ')[0] @(m.SquadHome ? "squad in" : "squad missing")</span>
+            <span class="staff-status @(m.SquadAway ? "staff-status--approved" : "staff-status--rejected")">@ClubBrand.NameFor(m.AwayCode).Split(' ')[0] @(m.SquadAway ? "squad in" : "squad missing")</span>
+        </span>
+    </div>
+    @if (m.Status == "Postponed")
+    {
+        <div class="match-row__postponed">Postponed: @m.PostponeReason</div>
+    }
+</a>

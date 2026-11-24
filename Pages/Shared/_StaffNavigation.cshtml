@@ -1,6 +1,5 @@
 <nav class="staff-nav" aria-label="Staff modules">
 	<div class="staff-nav__group">
-		<p class="staff-nav__label">Overview</p>
 		<a class="staff-nav__link" asp-page="/Staff/Dashboard">
 			<span aria-hidden="true">▦</span>
 			<span>Dashboard</span>
@@ -8,7 +7,6 @@
 	</div>
 
 	<div class="staff-nav__group">
-		<p class="staff-nav__label">Competition</p>
 		<a class="staff-nav__link" asp-page="/Staff/Clubs/Index">
 			<span aria-hidden="true">◉</span>
 			<span>Clubs</span>
@@ -29,7 +27,6 @@
 	</div>
 
 	<div class="staff-nav__group">
-		<p class="staff-nav__label">Administration</p>
 		<a class="staff-nav__link" href="#registrations">
 			<span aria-hidden="true">▤</span>
 			<span>Registrations</span>
@@ -50,7 +47,7 @@
 			<span aria-hidden="true">↩</span>
 			<span>View public site</span>
 		</a>
-		<a class="staff-nav__link" href="#sign-out">
+		<a class="staff-nav__link" asp-page="/Account/Login">
 			<span aria-hidden="true">→</span>
 			<span>Sign out</span>
 		</a>
