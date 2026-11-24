@@ -1,0 +1,68 @@
+@page
+@model FERW.Pages.League.ReportsModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Reports";
+    var w = Model.Workspace;
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Reports</h2>
+        <p>Top scorers and discipline for @w.SeasonName.</p>
+    </div>
+</div>
+
+<section class="staff-card mb-4">
+    <div class="staff-card__header">
+        <h3>Top scorers</h3>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" type="button">Export to PDF</button>
+            <button class="btn btn-sm btn-outline-primary" type="button">Export to Excel</button>
+        </div>
+    </div>
+    <div class="staff-table-wrap">
+        <table class="table staff-table">
+            <caption class="visually-hidden">Top scorers this season</caption>
+            <thead><tr><th scope="col">Player</th><th scope="col">Club</th><th scope="col">Goals</th></tr></thead>
+            <tbody>
+                @foreach (var s in w.Scorers)
+                {
+                    <tr>
+                        <th scope="row">@s.PlayerName</th>
+                        <td><span class="club-cell"><span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(s.Code)" aria-hidden="true">@s.Code</span>@ClubBrand.NameFor(s.Code)</span></td>
+                        <td>@s.Goals</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="staff-card">
+    <div class="staff-card__header">
+        <h3>Discipline</h3>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" type="button">Export to PDF</button>
+            <button class="btn btn-sm btn-outline-primary" type="button">Export to Excel</button>
+        </div>
+    </div>
+    <div class="staff-table-wrap">
+        <table class="table staff-table">
+            <caption class="visually-hidden">Discipline record this season</caption>
+            <thead><tr><th scope="col">Player</th><th scope="col">Club</th><th scope="col">Yellow</th><th scope="col">Red</th><th scope="col">Status</th></tr></thead>
+            <tbody>
+                @foreach (var d in w.Discipline)
+                {
+                    <tr>
+                        <th scope="row">@d.PlayerName</th>
+                        <td><span class="club-cell"><span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(d.Code)" aria-hidden="true">@d.Code</span>@ClubBrand.NameFor(d.Code)</span></td>
+                        <td>@d.Yellow</td>
+                        <td>@d.Red</td>
+                        <td><span class="staff-status @(d.Suspended ? "staff-status--rejected" : "staff-status--approved")">@(d.Suspended ? "Suspended" : "Clear")</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

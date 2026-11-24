@@ -1,0 +1,179 @@
+@page
+@model FERW.Pages.League.Match.DetailModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Match detail";
+    var m = Model.Match;
+}
+
+<a class="btn btn-outline-primary btn-sm mb-3" asp-page="/League/Calendar/Index">← Back to calendar</a>
+
+@if (m is null)
+{
+    <div class="staff-card"><div class="staff-empty"><strong>No match found.</strong></div></div>
+}
+else
+{
+    var statusClass = m.Status switch
+    {
+        "Scheduled" => "staff-status--scheduled",
+        "In play" => "staff-status--inplay",
+        "Finished" => "staff-status--approved",
+        "Result pending" => "staff-status--completed",
+        "Postponed" => "staff-status--rejected",
+        _ => "staff-status--pending",
+    };
+
+    <article class="staff-card">
+        <div class="staff-card__header">
+            <div class="d-flex align-items-center gap-3">
+                <span class="d-flex align-items-center gap-2">
+                    <span class="crest" style="--crest-color:@ClubBrand.ColorFor(m.HomeCode)" aria-hidden="true">@m.HomeCode</span>
+                    <strong>@ClubBrand.NameFor(m.HomeCode)</strong>
+                </span>
+                <span class="fw-bold text-muted">@(m.Score ?? "v")</span>
+                <span class="d-flex align-items-center gap-2">
+                    <strong>@ClubBrand.NameFor(m.AwayCode)</strong>
+                    <span class="crest" style="--crest-color:@ClubBrand.ColorFor(m.AwayCode)" aria-hidden="true">@m.AwayCode</span>
+                </span>
+            </div>
+            <span class="staff-status @statusClass">@m.Status</span>
+        </div>
+        <div class="staff-card__body">
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <strong class="d-block small text-muted">Stadium</strong>
+                    @m.Stadium
+                </div>
+                <div class="col-md-6">
+                    <strong class="d-block small text-muted">Kick-off</strong>
+                    @m.DisplayTime
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <strong class="d-block small text-muted">Referee</strong>
+                    @if (m.Referee is null)
+                    {
+                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="modal" data-bs-target="#assignRefModal">Assign referee</button>
+                    }
+                    else
+                    {
+                        @m.Referee
+                        <button class="btn btn-outline-primary btn-sm ms-2" type="button" data-bs-toggle="modal" data-bs-target="#assignRefModal">Change</button>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <strong class="d-block small text-muted">Squads</strong>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="staff-status @(m.SquadHome ? "staff-status--approved" : "staff-status--rejected")">@ClubBrand.NameFor(m.HomeCode) @(m.SquadHome ? "squad in" : "squad missing")</span>
+                        <span class="staff-status @(m.SquadAway ? "staff-status--approved" : "staff-status--rejected")">@ClubBrand.NameFor(m.AwayCode) @(m.SquadAway ? "squad in" : "squad missing")</span>
+                    </div>
+                </div>
+            </div>
+
+            @if (m.Status == "Postponed")
+            {
+                <p class="text-danger">Postponed: @m.PostponeReason</p>
+            }
+            @if (m.Score is not null)
+            {
+                <p class="staff-help">Result entered by the referee. Discipline events for this match appear in Reports.</p>
+            }
+
+            @if (m.Status is "Scheduled" or "In play" or "Result pending")
+            {
+                <div class="d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#postponeModal">Postpone match</button>
+                    <button class="btn btn-outline-primary" type="button" data-bs-toggle="modal" data-bs-target="#rescheduleModal">Reschedule match</button>
+                </div>
+            }
+        </div>
+    </article>
+
+    <div class="modal fade" id="postponeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Postpone this match?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>@ClubBrand.NameFor(m.HomeCode) v @ClubBrand.NameFor(m.AwayCode) will be marked postponed until a new date is set.</p>
+                    <label class="form-label" for="postponeReason">Reason</label>
+                    <textarea class="form-control" id="postponeReason" rows="3" placeholder="e.g. Pitch unplayable after heavy rain."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmPostpone" disabled>Postpone match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rescheduleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Reschedule this match?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Pick a new date and kick-off for @ClubBrand.NameFor(m.HomeCode) v @ClubBrand.NameFor(m.AwayCode).</p>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label" for="newMatchDate">New date</label>
+                            <input class="form-control" id="newMatchDate" type="date" value="@(m.Date?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="newMatchTime">New kick-off</label>
+                            <input class="form-control" id="newMatchTime" type="time" value="@(m.Kickoff?.ToString("HH:mm"))" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Reschedule match</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assignRefModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Assign referee</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="form-label" for="refSelect">Referee</label>
+                    <select class="form-select" id="refSelect">
+                        <option>Eric Nkusi</option>
+                        <option>Marie Uwase</option>
+                        <option>Jean Bosco</option>
+                        <option>Divine Ishimwe</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Save referee</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script>
+            (function () {
+                var reasonEl = document.getElementById('postponeReason');
+                var confirmBtn = document.getElementById('confirmPostpone');
+                if (reasonEl && confirmBtn) {
+                    reasonEl.addEventListener('input', function () {
+                        confirmBtn.disabled = reasonEl.value.trim().length === 0;
+                    });
+                }
+            })();
+        </script>
+    }
+}

@@ -1,0 +1,86 @@
+@page
+@model FERW.Pages.League.Standings.IndexModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Standings";
+    var w = Model.Workspace;
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Standings</h2>
+        <p>@w.SeasonName, after matchday @w.MatchdayPlayed.</p>
+    </div>
+    <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#publishModal">Publish standings</button>
+</div>
+
+<section class="staff-card">
+    <div class="staff-table-wrap">
+        <table class="table staff-table">
+            <caption class="visually-hidden">Rwanda Premier League standings</caption>
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Club</th>
+                    <th scope="col">P</th><th scope="col">W</th><th scope="col">D</th><th scope="col">L</th>
+                    <th scope="col">GF</th><th scope="col">GA</th><th scope="col">GD</th><th scope="col">Pts</th>
+                    <th scope="col">Form</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var r in w.Standings)
+                {
+                    <tr>
+                        <td>@r.Position</td>
+                        <th scope="row">
+                            <span class="club-cell">
+                                <span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(r.Code)" aria-hidden="true">@r.Code</span>
+                                @ClubBrand.NameFor(r.Code)
+                                @if (r.IsGuest)
+                                {
+                                    <span class="staff-status staff-status--scheduled">Guest club</span>
+                                }
+                            </span>
+                        </th>
+                        <td>@r.Played</td><td>@r.Won</td><td>@r.Drawn</td><td>@r.Lost</td>
+                        <td>@r.GoalsFor</td><td>@r.GoalsAgainst</td>
+                        <td>@(r.GoalDifference > 0 ? "+" : "")@r.GoalDifference</td>
+                        <td class="standings__pts">@r.Points</td>
+                        <td>
+                            <div class="form-guide">
+                                @foreach (var letter in r.Form)
+                                {
+                                    var cls = letter == 'W' ? "form-w" : letter == 'D' ? "form-d" : "form-l";
+                                    <span class="@cls">@letter</span>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<p class="staff-help mt-3">
+    <span class="staff-status staff-status--scheduled">Guest club</span>
+    clubs appear in the table but are not eligible for Rwandan prize money.
+</p>
+
+<div class="modal fade" id="publishModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5">Publish these standings?</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">This updates the table shown on the public site immediately. Anyone can see it.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Publish standings</button>
+            </div>
+        </div>
+    </div>
+</div>

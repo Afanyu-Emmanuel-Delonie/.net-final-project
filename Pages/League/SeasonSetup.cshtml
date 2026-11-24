@@ -1,0 +1,58 @@
+@page
+@model FERW.Pages.League.SeasonSetupModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Season setup";
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Season setup</h2>
+        <p>Create a season and pick the clubs FERWAFA has licensed. Unlicensed clubs can't be added.</p>
+    </div>
+</div>
+
+<section class="staff-card mb-4">
+    <div class="staff-card__header"><h3>Create a season</h3></div>
+    <div class="staff-card__body">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label" for="seasonName">Season</label>
+                <input class="form-control" id="seasonName" type="text" value="@Model.Workspace.SeasonName" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="seasonStart">Start date</label>
+                <input class="form-control" id="seasonStart" type="date" value="2026-09-05" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label" for="seasonEnd">End date</label>
+                <input class="form-control" id="seasonEnd" type="date" value="2027-05-23" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="staff-card">
+    <div class="staff-card__header"><h3>Clubs in this season</h3></div>
+    <div class="staff-card__body">
+        <ul class="staff-list">
+            @foreach (var c in Model.Workspace.SeasonClubs)
+            {
+                <li class="staff-list__item">
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="checkbox" checked="@c.Licensed" disabled="@(!c.Licensed)" />
+                        <span class="crest crest--sm" style="--crest-color:@ClubBrand.ColorFor(c.Code)" aria-hidden="true">@c.Code</span>
+                        <div>
+                            <strong class="d-block">@ClubBrand.NameFor(c.Code)</strong>
+                            @if (!c.Licensed)
+                            {
+                                <small class="text-muted">@c.Reason</small>
+                            }
+                        </div>
+                    </div>
+                    <span class="staff-status @(c.Licensed ? "staff-status--licensed" : "staff-status--rejected")">@(c.Licensed ? "Licensed" : "Not licensed")</span>
+                </li>
+            }
+        </ul>
+    </div>
+</section>

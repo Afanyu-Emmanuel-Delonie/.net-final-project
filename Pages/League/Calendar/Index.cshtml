@@ -1,0 +1,191 @@
+@page
+@model FERW.Pages.League.Calendar.IndexModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Fixture calendar";
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Fixture calendar</h2>
+        <p>@Model.Workspace.SeasonName season, @Model.Round.</p>
+    </div>
+    <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#addMatchModal">Add match</button>
+</div>
+
+<div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+    <nav class="pill-tabs" aria-label="Round">
+        <a class="@(Model.Round == "Round 1" ? "is-active" : "")" asp-page="/League/Calendar/Index" asp-route-round="1" asp-route-view="@Model.View" asp-route-club="@Model.SelectedClub">Round 1 · Sep–Dec</a>
+        <a class="@(Model.Round == "Round 2" ? "is-active" : "")" asp-page="/League/Calendar/Index" asp-route-round="2" asp-route-view="@Model.View" asp-route-club="@Model.SelectedClub">Round 2 · Jan–May</a>
+    </nav>
+    <nav class="pill-tabs" aria-label="Calendar view">
+        <a class="@(Model.View == "matchday" ? "is-active" : "")" asp-page="/League/Calendar/Index" asp-route-view="matchday" asp-route-round="@(Model.Round == "Round 2" ? "2" : "1")">By matchday</a>
+        <a class="@(Model.View == "club" ? "is-active" : "")" asp-page="/League/Calendar/Index" asp-route-view="club" asp-route-round="@(Model.Round == "Round 2" ? "2" : "1")" asp-route-club="@Model.SelectedClub">By club</a>
+    </nav>
+    @if (Model.View == "club")
+    {
+        <form method="get" asp-page="/League/Calendar/Index" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="view" value="club" />
+            <input type="hidden" name="round" value="@(Model.Round == "Round 2" ? "2" : "1")" />
+            <select class="form-select form-select-sm" name="club" onchange="this.form.submit()">
+                @foreach (var c in Model.Workspace.SeasonClubs)
+                {
+                    <option value="@c.Code" selected="@(c.Code == Model.SelectedClub)">@ClubBrand.NameFor(c.Code)</option>
+                }
+            </select>
+        </form>
+    }
+</div>
+
+@if (Model.View == "matchday")
+{
+    <section class="staff-card">
+        <div class="staff-card__header"><h3>Matchday @Model.Workspace.MatchdayPlayed</h3></div>
+        <div class="staff-card__body">
+            @if (Model.RoundMatches.Count == 0)
+            {
+                <div class="staff-empty"><strong>No fixtures yet.</strong> Add the licensed clubs to the season, then build matchday 1.</div>
+            }
+            else
+            {
+                <ul class="match-list">
+                    @foreach (var m in Model.RoundMatches)
+                    {
+                        <li><partial name="_MatchRow" model="m" /></li>
+                    }
+                </ul>
+            }
+        </div>
+    </section>
+}
+else
+{
+    <section class="staff-card">
+        <div class="staff-card__header"><h3>@ClubBrand.NameFor(Model.SelectedClub ?? "")'s fixtures</h3></div>
+        <div class="staff-card__body">
+            @if (Model.ClubMatches.Count == 0)
+            {
+                <div class="staff-empty"><strong>No fixtures yet for this club in @Model.Round.</strong></div>
+            }
+            else
+            {
+                <ul class="match-list">
+                    @foreach (var m in Model.ClubMatches)
+                    {
+                        <li><partial name="_MatchRow" model="m" /></li>
+                    }
+                </ul>
+            }
+        </div>
+    </section>
+}
+
+<div class="modal fade" id="addMatchModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5">Add match — matchday @Model.Workspace.MatchdayPlayed</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="newHome">Home club</label>
+                        <select class="form-select" id="newHome">
+                            @foreach (var c in Model.Workspace.SeasonClubs)
+                            {
+                                <option value="@c.Code">@ClubBrand.NameFor(c.Code)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="newAway">Away club</label>
+                        <select class="form-select" id="newAway">
+                            <option value="">Choose away club</option>
+                            @foreach (var c in Model.Workspace.SeasonClubs)
+                            {
+                                <option value="@c.Code">@ClubBrand.NameFor(c.Code)</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="newStadium">Stadium</label>
+                        <select class="form-select" id="newStadium">
+                            @foreach (var s in FERW.Pages.League.Calendar.IndexModel.Stadiums)
+                            {
+                                <option>@s</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="newDate">Match date</label>
+                        <input class="form-control" id="newDate" type="date" value="2026-11-22" />
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label" for="newKickoff">Kick-off</label>
+                        <input class="form-control" id="newKickoff" type="time" value="15:00" />
+                    </div>
+                </div>
+                <ul class="check-list" id="clashChecks"></ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="scheduleMatchBtn" disabled>Schedule match</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script id="existingMatches" type="application/json">@Html.Raw(Model.MatchesJson)</script>
+    <script>
+        (function () {
+            var matches = JSON.parse(document.getElementById('existingMatches').textContent);
+            var homeSel = document.getElementById('newHome');
+            var awaySel = document.getElementById('newAway');
+            var stadiumSel = document.getElementById('newStadium');
+            var dateInput = document.getElementById('newDate');
+            var kickoffInput = document.getElementById('newKickoff');
+            var scheduleBtn = document.getElementById('scheduleMatchBtn');
+            var clubNames = {};
+            @foreach (var c in Model.Workspace.SeasonClubs)
+            {
+                <text>clubNames['@c.Code'] = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ClubBrand.NameFor(c.Code)));</text>
+            }
+
+            function check() {
+                var home = homeSel.value, away = awaySel.value, stadium = stadiumSel.value;
+                var date = dateInput.value, kickoff = kickoffInput.value;
+                var sameSlot = function (m) { return m.date === date && m.kickoff === kickoff; };
+                var checks = [];
+
+                var notSameClub = !away || home !== away;
+                checks.push({ ok: notSameClub, label: 'Home and away are different clubs', why: notSameClub ? null : 'A club cannot play itself' });
+
+                var homeBusy = away && matches.some(function (m) { return sameSlot(m) && (m.home === home || m.away === home); });
+                checks.push({ ok: !homeBusy, label: clubNames[home] + ' is free at this kick-off', why: homeBusy ? clubNames[home] + ' already has a match at this time' : null });
+
+                if (away) {
+                    var awayBusy = matches.some(function (m) { return sameSlot(m) && (m.home === away || m.away === away); });
+                    checks.push({ ok: !awayBusy, label: clubNames[away] + ' is free at this kick-off', why: awayBusy ? clubNames[away] + ' already has a match at this time' : null });
+                }
+
+                var stadiumBusy = date && kickoff && matches.some(function (m) { return sameSlot(m) && m.stadium === stadium; });
+                checks.push({ ok: !stadiumBusy, label: stadium + ' is free at this kick-off', why: stadiumBusy ? 'Already booked for another match at this time' : null });
+
+                document.getElementById('clashChecks').innerHTML = checks.map(function (c) {
+                    return '<li class="check-list__item"><span class="check-list__mark ' + (c.ok ? 'pass' : 'fail') + '">' + (c.ok ? '✓' : '✕') + '</span><span>' + c.label + (c.why ? '<span class="check-list__why">' + c.why + '</span>' : '') + '</span></li>';
+                }).join('');
+
+                scheduleBtn.disabled = !(checks.every(function (c) { return c.ok; }) && away && date && kickoff);
+            }
+
+            [homeSel, awaySel, stadiumSel].forEach(function (el) { el.addEventListener('change', check); });
+            dateInput.addEventListener('input', check);
+            kickoffInput.addEventListener('input', check);
+            document.getElementById('addMatchModal').addEventListener('shown.bs.modal', check);
+        })();
+    </script>
+}

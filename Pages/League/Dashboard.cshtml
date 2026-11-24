@@ -1,0 +1,105 @@
+@page
+@model FERW.Pages.League.DashboardModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Dashboard";
+    var w = Model.Workspace;
+    var resultPending = w.Matches.Where(m => m.Status == "Result pending").ToList();
+    var squadsMissing = w.Matches.Where(m => !m.SquadHome || !m.SquadAway).ToList();
+    var postponed = w.Matches.Where(m => m.Status == "Postponed").ToList();
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Good morning, Alice</h2>
+        <p>@w.SeasonName season, matchday @w.MatchdayPlayed of @w.TotalMatchdays.</p>
+    </div>
+    <a class="btn-ffms btn-ffms-green" asp-page="/League/Matchday/Index">Open matchday control</a>
+</div>
+
+<div class="row g-4">
+    <section class="col-xl-7" aria-labelledby="next-md-title">
+        <article class="staff-card">
+            <div class="staff-card__header">
+                <h3 id="next-md-title">Matchday @w.MatchdayPlayed fixtures</h3>
+                <a class="section__link" asp-page="/League/Calendar/Index">View calendar</a>
+            </div>
+            <div class="staff-card__body">
+                <ul class="match-list">
+                    @foreach (var m in w.Matches)
+                    {
+                        <li><partial name="_MatchRow" model="m" /></li>
+                    }
+                </ul>
+            </div>
+        </article>
+    </section>
+
+    <div class="col-xl-5" style="display:grid; gap:1.5rem;">
+        <article class="staff-card">
+            <div class="staff-card__header"><h3>Waiting for referees</h3></div>
+            <div class="staff-card__body">
+                @if (resultPending.Count == 0)
+                {
+                    <div class="staff-empty"><strong>No results waiting.</strong> Every finished match this matchday has a result in.</div>
+                }
+                else
+                {
+                    <ul class="staff-list">
+                        @foreach (var m in resultPending)
+                        {
+                            <li class="staff-list__item">
+                                <div><strong>@ClubBrand.NameFor(m.HomeCode) v @ClubBrand.NameFor(m.AwayCode)</strong><small>@m.DisplayTime · @m.Referee</small></div>
+                                <span class="staff-status staff-status--completed">Result pending</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </article>
+
+        <article class="staff-card">
+            <div class="staff-card__header"><h3>Squads not submitted</h3></div>
+            <div class="staff-card__body">
+                @if (squadsMissing.Count == 0)
+                {
+                    <div class="staff-empty"><strong>Every club has submitted.</strong></div>
+                }
+                else
+                {
+                    <ul class="staff-list">
+                        @foreach (var m in squadsMissing)
+                        {
+                            <li class="staff-list__item">
+                                <div><strong>@(m.SquadHome ? ClubBrand.NameFor(m.AwayCode) : ClubBrand.NameFor(m.HomeCode))</strong><small>@ClubBrand.NameFor(m.HomeCode) v @ClubBrand.NameFor(m.AwayCode), @m.DisplayTime</small></div>
+                                <span class="staff-status staff-status--rejected">Squad missing</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </article>
+
+        <article class="staff-card">
+            <div class="staff-card__header"><h3>Postponed matches</h3></div>
+            <div class="staff-card__body">
+                @if (postponed.Count == 0)
+                {
+                    <div class="staff-empty"><strong>Nothing postponed.</strong></div>
+                }
+                else
+                {
+                    <ul class="staff-list">
+                        @foreach (var m in postponed)
+                        {
+                            <li class="staff-list__item">
+                                <div><strong>@ClubBrand.NameFor(m.HomeCode) v @ClubBrand.NameFor(m.AwayCode)</strong><small>@m.PostponeReason</small></div>
+                                <span class="staff-status staff-status--rejected">Postponed</span>
+                            </li>
+                        }
+                    </ul>
+                }
+            </div>
+        </article>
+    </div>
+</div>
