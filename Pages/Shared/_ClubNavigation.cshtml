@@ -1,0 +1,51 @@
+@{
+	var path = Context.Request.Path.Value ?? "";
+	string? ActiveIf(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) ? "page" : null;
+}
+<nav class="staff-nav" aria-label="Club manager modules">
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Club/Dashboard" aria-current="@ActiveIf("/Club/Dashboard")">
+			<span aria-hidden="true">▦</span>
+			<span>Dashboard</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Club/Profile" aria-current="@ActiveIf("/Club/Profile")">
+			<span aria-hidden="true">◉</span>
+			<span>Profile &amp; licensing</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Club/Squad/Index" aria-current="@ActiveIf("/Club/Squad")">
+			<span aria-hidden="true">☷</span>
+			<span>Squad</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/Club/Register" aria-current="@ActiveIf("/Club/Register")">
+			<span aria-hidden="true">＋</span>
+			<span>Register a player</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Club/Transfers/Index" aria-current="@ActiveIf("/Club/Transfers")">
+			<span aria-hidden="true">⇄</span>
+			<span>Transfers &amp; loans</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/Club/Matchday/Index" aria-current="@ActiveIf("/Club/Matchday")">
+			<span aria-hidden="true">▤</span>
+			<span>Matchday squad</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__footer">
+		<a class="staff-nav__link" asp-page="/Account/Login">
+			<span aria-hidden="true">→</span>
+			<span>Sign out</span>
+		</a>
+	</div>
+</nav>

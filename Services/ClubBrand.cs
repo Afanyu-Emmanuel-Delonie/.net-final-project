@@ -21,6 +21,27 @@ public static class ClubBrand
         ["HER"] = "#475569",
     };
 
+    private static readonly Dictionary<string, string> Names = new()
+    {
+        ["MAR"] = "Marines FC",
+        ["APR"] = "APR FC",
+        ["RAY"] = "Rayon Sports",
+        ["POL"] = "Police FC",
+        ["KIY"] = "Kiyovu SC",
+        ["MUK"] = "Mukura VS",
+        ["ETI"] = "Etincelles FC",
+        ["GIC"] = "Gicumbi FC",
+        ["BUG"] = "Bugesera FC",
+        ["ASK"] = "AS Kigali",
+        ["GOR"] = "Gorilla FC",
+        ["VIS"] = "Vision Generation",
+        ["MUS"] = "Musanze FC",
+        ["HER"] = "Heroes FC",
+    };
+
     public static string ColorFor(string shortCode) =>
         Colors.TryGetValue(shortCode, out var hex) ? hex : "#0B6E4F";
+
+    public static string NameFor(string shortCode) =>
+        Names.TryGetValue(shortCode, out var name) ? name : shortCode;
 }

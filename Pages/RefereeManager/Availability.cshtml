@@ -1,0 +1,51 @@
+@page
+@model FERW.Pages.RefereeManager.AvailabilityModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Availability";
+    var w = Model.Workspace;
+    var refereesById = w.Referees.ToDictionary(r => r.Id);
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Availability</h2>
+        <p>Who can take a match over the next three matchdays. Assign referees from each fixture's match detail page.</p>
+    </div>
+</div>
+
+<section class="staff-card">
+    <div class="staff-table-wrap">
+        <table class="table staff-table">
+            <caption class="visually-hidden">Referee availability by matchday</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Referee</th>
+                    @foreach (var label in w.MatchdayLabels)
+                    {
+                        <th scope="col" class="text-center">@label</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in w.Availability)
+                {
+                    var r = refereesById[row.RefereeId];
+                    <tr>
+                        <th scope="row"><span class="club-cell"><span class="person-avatar">@FERW.Pages.RefereeManager.Roster.IndexModel.Initials(r.Name)</span>@r.Name</span></th>
+                        @foreach (var cell in row.Cells)
+                        {
+                            <td class="text-center"><span class="avail-cell @FERW.Pages.RefereeManager.AvailabilityModel.CellClass(cell)">@FERW.Pages.RefereeManager.AvailabilityModel.CellLabel(cell)</span></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<p class="staff-help mt-3">
+    <span class="avail-cell avail-cell--available">Available</span>
+    <span class="avail-cell avail-cell--assigned">Assigned</span>
+    <span class="avail-cell avail-cell--unavailable">Unavailable</span>
+</p>

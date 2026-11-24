@@ -5,6 +5,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<ILeagueSnapshotService, DemoLeagueSnapshotService>();
 builder.Services.AddScoped<IAdminWorkspaceService, DemoAdminWorkspaceService>();
+builder.Services.AddScoped<ILeagueManagerWorkspaceService, DemoLeagueManagerWorkspaceService>();
+builder.Services.AddScoped<IClubManagerWorkspaceService, DemoClubManagerWorkspaceService>();
+builder.Services.AddScoped<IRefereeManagerWorkspaceService, DemoRefereeManagerWorkspaceService>();
 
 var app = builder.Build();
 

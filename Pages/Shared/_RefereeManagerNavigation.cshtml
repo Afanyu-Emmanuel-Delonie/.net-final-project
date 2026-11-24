@@ -1,0 +1,37 @@
+@{
+	var path = Context.Request.Path.Value ?? "";
+	string? ActiveIf(string prefix) => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) ? "page" : null;
+}
+<nav class="staff-nav" aria-label="Referee manager modules">
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/RefereeManager/Dashboard" aria-current="@ActiveIf("/RefereeManager/Dashboard")">
+			<span aria-hidden="true">▦</span>
+			<span>Dashboard</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/RefereeManager/Roster/Index" aria-current="@ActiveIf("/RefereeManager/Roster")">
+			<span aria-hidden="true">☷</span>
+			<span>Referee roster</span>
+		</a>
+		<a class="staff-nav__link" asp-page="/RefereeManager/Register" aria-current="@ActiveIf("/RefereeManager/Register")">
+			<span aria-hidden="true">＋</span>
+			<span>Register a referee</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__group">
+		<a class="staff-nav__link" asp-page="/RefereeManager/Availability" aria-current="@ActiveIf("/RefereeManager/Availability")">
+			<span aria-hidden="true">▤</span>
+			<span>Availability</span>
+		</a>
+	</div>
+
+	<div class="staff-nav__footer">
+		<a class="staff-nav__link" asp-page="/Account/Login">
+			<span aria-hidden="true">→</span>
+			<span>Sign out</span>
+		</a>
+	</div>
+</nav>

@@ -31,6 +31,44 @@
                 <button type="submit" class="btn-ffms btn-ffms-green auth-submit">Sign in</button>
             </form>
             <p class="auth-switch">Need an account? <a asp-page="/Account/Register">Request staff access</a></p>
+
+            <div class="demo-accounts">
+                <p class="demo-accounts__title">Demo accounts</p>
+                <p class="demo-accounts__hint">This prototype has no real sign-in yet — jump straight into a role to see its workspace.</p>
+
+                <div class="demo-account">
+                    <span class="demo-avatar" aria-hidden="true">JN</span>
+                    <span class="demo-account__body">
+                        <strong>Jean Claude Niyonzima</strong>
+                        <small>Federation admin</small>
+                    </span>
+                    <a class="btn-ffms btn-ffms-outline" asp-page="/Admin/Dashboard">Continue</a>
+                </div>
+                <div class="demo-account">
+                    <span class="demo-avatar" aria-hidden="true">AU</span>
+                    <span class="demo-account__body">
+                        <strong>Alice Uwase</strong>
+                        <small>League manager</small>
+                    </span>
+                    <a class="btn-ffms btn-ffms-outline" asp-page="/League/Dashboard">Continue</a>
+                </div>
+                <div class="demo-account">
+                    <span class="demo-avatar" aria-hidden="true">DU</span>
+                    <span class="demo-account__body">
+                        <strong>Diane Uwimana</strong>
+                        <small>Club manager, Rayon Sports</small>
+                    </span>
+                    <a class="btn-ffms btn-ffms-outline" asp-page="/Club/Dashboard">Continue</a>
+                </div>
+                <div class="demo-account">
+                    <span class="demo-avatar" aria-hidden="true">PS</span>
+                    <span class="demo-account__body">
+                        <strong>Patrick Sendegeya</strong>
+                        <small>Referee manager</small>
+                    </span>
+                    <a class="btn-ffms btn-ffms-outline" asp-page="/RefereeManager/Dashboard">Continue</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -1,0 +1,111 @@
+@page
+@model FERW.Pages.RefereeManager.Referee.DetailModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Referee detail";
+    var r = Model.Referee;
+}
+
+<a class="btn btn-outline-primary btn-sm mb-3" asp-page="/RefereeManager/Roster/Index">← Back to roster</a>
+
+@if (r is null)
+{
+    <div class="staff-card"><div class="staff-empty"><strong>No referee found.</strong></div></div>
+}
+else
+{
+    <div class="staff-page-header">
+        <div class="d-flex align-items-center gap-3">
+            <span class="person-avatar person-avatar--lg" aria-hidden="true">@FERW.Pages.RefereeManager.Referee.DetailModel.Initials(r.Name)</span>
+            <div>
+                <h2>@r.Name</h2>
+                <p><span class="cert-badge @FERW.Pages.RefereeManager.Referee.DetailModel.CertClass(r.Certification)">@r.Certification</span></p>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            <span class="staff-status @FERW.Pages.RefereeManager.Referee.DetailModel.StatusClass(r.Status)">@r.Status</span>
+            <button type="button" class="btn-ffms btn-ffms-green btn-ffms-sm" data-bs-toggle="modal" data-bs-target="#assignModal">Assign to a match</button>
+            <button type="button" class="btn-ffms btn-ffms-outline btn-ffms-sm" data-bs-toggle="modal" data-bs-target="#deleteModal">Remove from roster</button>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-1">
+        <div class="col-md-4"><div class="staff-card staff-stat"><p class="staff-stat__label">Matches this season</p><p class="staff-stat__value">@r.MatchesThisSeason</p></div></div>
+        <div class="col-md-4"><div class="staff-card staff-stat"><p class="staff-stat__label">Yellow cards issued</p><p class="staff-stat__value">@r.YellowCards</p></div></div>
+        <div class="col-md-4"><div class="staff-card staff-stat"><p class="staff-stat__label">Red cards issued</p><p class="staff-stat__value">@r.RedCards</p></div></div>
+    </div>
+
+    <div class="row g-3 mt-2">
+        <div class="col-lg-6">
+            <section class="staff-card">
+                <div class="staff-card__header"><h3>Record</h3></div>
+                <div class="staff-card__body">
+                    <ul class="staff-list">
+                        <li class="staff-list__item"><span>Licensed since</span><strong>@r.LicensedSince</strong></li>
+                        <li class="staff-list__item"><span>Phone</span><strong>@r.Phone</strong></li>
+                        <li class="staff-list__item"><span>Performance notes</span><strong>@r.Notes</strong></li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-6">
+            <section class="staff-card">
+                <div class="staff-card__header"><h3>Recent matches officiated</h3></div>
+                <div class="staff-card__body">
+                    @if (!r.RecentMatches.Any())
+                    {
+                        <p class="staff-help mb-0">No matches officiated yet.</p>
+                    }
+                    else
+                    {
+                        <ul class="staff-list">
+                            @foreach (var m in r.RecentMatches)
+                            {
+                                <li class="staff-list__item"><span>@m</span></li>
+                            }
+                        </ul>
+                    }
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="modal fade" id="assignModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Assign @r.Name to a match</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="staff-help mb-2">Matches that still need a referee.</p>
+                    <select class="form-select">
+                        <option>@Model.UnassignedMatchLabel</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Assign referee</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5">Remove @r.Name from the roster?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-0">They won't be available for new assignments. This doesn't erase their past match history.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Remove referee</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}

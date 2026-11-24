@@ -1,0 +1,85 @@
+@page
+@model FERW.Pages.RefereeManager.DashboardModel
+@using FERW.Services
+@{
+    ViewData["Title"] = "Dashboard";
+    var w = Model.Workspace;
+    var activeCount = w.Referees.Count(r => r.Status == "Active");
+    var fifaCount = w.Referees.Count(r => r.Certification == "FIFA-listed");
+    var nationalCount = w.Referees.Count(r => r.Certification == "National");
+    var regionalCount = w.Referees.Count(r => r.Certification == "Regional");
+    var unavailableCount = w.Referees.Count(r => r.Status == "Unavailable");
+    var pendingCount = w.Referees.Count(r => r.Status == "Pending");
+    var availableNextMatchday = w.Referees.Count(r => r.Status == "Active");
+}
+
+<div class="staff-page-header">
+    <div>
+        <h2>Good afternoon, Patrick</h2>
+        <p>Here's the referee pool for the coming matchday.</p>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="staff-card staff-stat">
+            <p class="staff-stat__label">Active referees</p>
+            <p class="staff-stat__value">@activeCount</p>
+            <p class="staff-help mb-0">@fifaCount FIFA-listed, @nationalCount national, @regionalCount regional</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="staff-card staff-stat">
+            <p class="staff-stat__label">Available · Matchday 9</p>
+            <p class="staff-stat__value">@availableNextMatchday<span class="fs-6 text-muted fw-normal"> of @w.Referees.Count</span></p>
+            <p class="staff-help mb-0">@unavailableCount unavailable, 0 conflicts</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="staff-card staff-stat">
+            <p class="staff-stat__label">New applications</p>
+            <p class="staff-stat__value" style="color:#8A5A00;">@pendingCount</p>
+            <p class="staff-help mb-0">Awaiting document review</p>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <section class="staff-card">
+            <div class="staff-card__header"><h3>Needs your action</h3></div>
+            <div class="staff-card__body">
+                <ul class="staff-list">
+                    @foreach (var item in w.ActionItems)
+                    {
+                        <li class="staff-list__item">
+                            <div><strong>@item.Title</strong><small>@item.Detail</small></div>
+                            <span class="staff-status @item.BadgeClass">@item.BadgeText</span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-5">
+        <section class="staff-card">
+            <div class="staff-card__header"><h3>This matchday's assignments</h3></div>
+            <div class="staff-card__body">
+                <ul class="staff-list">
+                    <li class="staff-list__item">
+                        <div><strong>Mukura VS vs APR FC</strong><small>Sat 28 Nov, 15:00 · Huye Stadium</small></div>
+                        <span class="club-cell"><span class="person-avatar">MU</span>Marie Uwase</span>
+                    </li>
+                    <li class="staff-list__item">
+                        <div><strong>Etincelles FC vs Gicumbi FC</strong><small>Sat 28 Nov, 15:00 · Umuganda Stadium</small></div>
+                        <span class="club-cell"><span class="person-avatar">DI</span>Divine Ishimwe</span>
+                    </li>
+                    <li class="staff-list__item">
+                        <div><strong>APR FC vs Rayon Sports</strong><small>Sun 29 Nov, 16:00 · Kigali Pelé Stadium</small></div>
+                        <span class="staff-status staff-status--warn">Unassigned</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </div>
+</div>
