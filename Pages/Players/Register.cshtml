@@ -1,0 +1,225 @@
+@page
+@model FERW.Pages.Players.RegisterModel
+@using FERW.Models
+@{
+	ViewData["Title"] = "Register a player";
+	var hasOpenWindow = Model.OpenWindows.Count > 0;
+}
+
+<div class="staff-page-header">
+	<div>
+		<h2>Register a player</h2>
+		<p>Submit a new signing for FERWAFA review. A signed contract, a medical report and proof of insurance are required.</p>
+	</div>
+</div>
+
+@if (Model.SuccessMessage is not null)
+{
+	<div class="alert alert-success" role="status">@Model.SuccessMessage</div>
+}
+
+@if (!hasOpenWindow)
+{
+	<section class="staff-card mb-4">
+		<div class="staff-empty">
+			<strong>No registration window is open</strong>
+			FERWAFA opens windows for men's professional, women's professional and amateur players. You can submit registrations once a window opens.
+		</div>
+	</section>
+}
+else
+{
+	<section class="staff-card mb-4" aria-labelledby="registration-form-title">
+		<div class="staff-card__header">
+			<h3 id="registration-form-title">Player registration details</h3>
+			<span class="staff-help"><span aria-hidden="true">*</span> Required fields</span>
+		</div>
+		<div class="staff-card__body">
+			<form method="post" enctype="multipart/form-data" novalidate>
+				<div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+				<div class="staff-form-section">
+					<h3>Registration</h3>
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.RegistrationWindowId">Registration window <span aria-hidden="true">*</span></label>
+							<select class="form-select" asp-for="Input.RegistrationWindowId" asp-items="Model.WindowOptions">
+								<option value="">Choose window</option>
+							</select>
+							<span class="text-danger small" asp-validation-for="Input.RegistrationWindowId"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.RegistrationType">Registration type <span aria-hidden="true">*</span></label>
+							<select class="form-select" asp-for="Input.RegistrationType" asp-items="Model.RegistrationTypeOptions"></select>
+							<span class="text-danger small" asp-validation-for="Input.RegistrationType"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="staff-form-section">
+					<h3>Personal details</h3>
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.FirstName">First name <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.FirstName" autocomplete="off" />
+							<span class="text-danger small" asp-validation-for="Input.FirstName"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.LastName">Last name <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.LastName" autocomplete="off" />
+							<span class="text-danger small" asp-validation-for="Input.LastName"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.DateOfBirth">Date of birth <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.DateOfBirth" type="date" aria-describedby="dobHelp" />
+							<div class="staff-help" id="dobHelp">As shown on the player's identity document.</div>
+							<span class="text-danger small" asp-validation-for="Input.DateOfBirth"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.Nationality">Nationality <span aria-hidden="true">*</span></label>
+							<select class="form-select" asp-for="Input.Nationality" asp-items="Model.NationalityOptions" aria-describedby="nationalityHelp"></select>
+							<div class="staff-help" id="nationalityHelp">Non-Rwandan players count as foreign players and pay the foreign-player registration fee.</div>
+							<span class="text-danger small" asp-validation-for="Input.Nationality"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.NationalIdOrPassport">National ID or passport number <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.NationalIdOrPassport" autocomplete="off" />
+							<span class="text-danger small" asp-validation-for="Input.NationalIdOrPassport"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.Phone">Phone number</label>
+							<input class="form-control" asp-for="Input.Phone" type="tel" autocomplete="off" />
+							<span class="text-danger small" asp-validation-for="Input.Phone"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="staff-form-section">
+					<h3>Football details</h3>
+					<div class="row g-3">
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.Position">Position <span aria-hidden="true">*</span></label>
+							<select class="form-select" asp-for="Input.Position" asp-items="Model.PositionOptions">
+								<option value="">Choose position</option>
+							</select>
+							<span class="text-danger small" asp-validation-for="Input.Position"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.PreferredShirtNumber">Preferred shirt number</label>
+							<input class="form-control" asp-for="Input.PreferredShirtNumber" min="1" max="99" />
+							<span class="text-danger small" asp-validation-for="Input.PreferredShirtNumber"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.ContractStartDate">Contract start date <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.ContractStartDate" type="date" />
+							<span class="text-danger small" asp-validation-for="Input.ContractStartDate"></span>
+						</div>
+						<div class="col-md-6">
+							<label class="form-label" asp-for="Input.ContractEndDate">Contract end date <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.ContractEndDate" type="date" />
+							<span class="text-danger small" asp-validation-for="Input.ContractEndDate"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="staff-form-section">
+					<h3>Supporting documents</h3>
+					<p class="staff-help">PDF, JPG or PNG, up to 5 MB each. All three documents are required before you can submit.</p>
+					<div class="row g-3">
+						<div class="col-md-4">
+							<label class="form-label" asp-for="Input.Contract">Signed contract <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.Contract" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+							<span class="text-danger small" asp-validation-for="Input.Contract"></span>
+						</div>
+						<div class="col-md-4">
+							<label class="form-label" asp-for="Input.MedicalReport">Medical report <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.MedicalReport" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+							<span class="text-danger small" asp-validation-for="Input.MedicalReport"></span>
+						</div>
+						<div class="col-md-4">
+							<label class="form-label" asp-for="Input.Insurance">Proof of insurance <span aria-hidden="true">*</span></label>
+							<input class="form-control" asp-for="Input.Insurance" type="file" accept=".pdf,.jpg,.jpeg,.png" />
+							<span class="text-danger small" asp-validation-for="Input.Insurance"></span>
+						</div>
+						<div class="col-md-4">
+							<label class="form-label" asp-for="Input.Photo">Player photo</label>
+							<input class="form-control" asp-for="Input.Photo" type="file" accept=".jpg,.jpeg,.png" aria-describedby="photoHelp" />
+							<div class="staff-help" id="photoHelp">Optional. JPG or PNG, up to 2 MB.</div>
+							<span class="text-danger small" asp-validation-for="Input.Photo"></span>
+						</div>
+					</div>
+				</div>
+
+				<div class="staff-form-actions">
+					<button class="btn-ffms btn-ffms-outline" type="reset">Clear form</button>
+					<button class="btn-ffms btn-ffms-green" type="submit">Submit for review</button>
+				</div>
+			</form>
+		</div>
+	</section>
+}
+
+<section class="staff-card" aria-labelledby="submissions-title">
+	<div class="staff-card__header">
+		<h3 id="submissions-title">Your recent submissions</h3>
+	</div>
+	@if (Model.Submissions.Count == 0)
+	{
+		<div class="staff-empty">
+			<strong>No submissions yet</strong>
+			Registrations you submit appear here with their review status.
+		</div>
+	}
+	else
+	{
+		<div class="staff-table-wrap">
+			<table class="table staff-table">
+				<caption class="visually-hidden">Player registrations submitted by your club</caption>
+				<thead>
+					<tr>
+						<th scope="col">Player</th>
+						<th scope="col">Window</th>
+						<th scope="col">Submitted</th>
+						<th scope="col">Foreign fee</th>
+						<th scope="col">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var s in Model.Submissions)
+					{
+						var statusClass = s.Status switch
+						{
+							RegistrationStatus.Approved => "staff-status--approved",
+							RegistrationStatus.Rejected => "staff-status--rejected",
+							_ => "staff-status--pending"
+						};
+						<tr>
+							<td>
+								<strong class="d-block">@s.PlayerName</strong>
+								@if (s.IsForeign)
+								{
+									<small class="staff-help">Foreign player</small>
+								}
+							</td>
+							<td>@s.Category.Label()</td>
+							<td>@s.SubmittedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm")</td>
+							<td>@(s.ForeignFeeRwf is int fee ? $"{fee:N0} RWF" : "—")</td>
+							<td>
+								<span class="staff-status @statusClass">@s.Status</span>
+								@if (!string.IsNullOrEmpty(s.Remarks))
+								{
+									<small class="staff-help d-block">@s.Remarks</small>
+								}
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</section>
+
+@section Scripts {
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<partial name="_ValidationScriptsPartial" />
+}
