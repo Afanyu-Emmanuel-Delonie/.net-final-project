@@ -92,6 +92,16 @@
     text-decoration: none;
 }
 
+/* Sign out is a POST form; make its button look like the other nav links. */
+.staff-nav__button {
+    width: 100%;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
 .staff-nav__link:hover,
 .staff-nav__link:focus-visible,
 .staff-nav__link[aria-current="page"] {

@@ -22,7 +22,7 @@
 			<span aria-hidden="true">☷</span>
 			<span>Squad</span>
 		</a>
-		<a class="staff-nav__link" asp-page="/Club/Register" aria-current="@ActiveIf("/Club/Register")">
+		<a class="staff-nav__link" asp-page="/Players/Register" aria-current="@ActiveIf("/Players/Register")">
 			<span aria-hidden="true">＋</span>
 			<span>Register a player</span>
 		</a>
@@ -43,9 +43,11 @@
 	</div>
 
 	<div class="staff-nav__footer">
-		<a class="staff-nav__link" asp-page="/Account/Login">
-			<span aria-hidden="true">→</span>
-			<span>Sign out</span>
-		</a>
+		<form method="post" asp-page="/Account/Login" asp-page-handler="Logout">
+			<button type="submit" class="staff-nav__link staff-nav__button">
+				<span aria-hidden="true">→</span>
+				<span>Sign out</span>
+			</button>
+		</form>
 	</div>
 </nav>
