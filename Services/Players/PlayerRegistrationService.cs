@@ -37,8 +37,11 @@ public interface IPlayerRegistrationService
 {
     Task<IReadOnlyList<OpenWindow>> GetOpenWindowsAsync(CancellationToken ct = default);
     Task<IReadOnlyList<ClubSubmission>> GetClubSubmissionsAsync(int clubId, int take = 10, CancellationToken ct = default);
-    Task<SubmitResult> SubmitAsync(int clubId, string submittedBy, RegistrationRequest request, RegistrationFiles files, CancellationToken ct = default);
+    Task<SubmitResult> SubmitAsync(Submitter submitter, RegistrationRequest request, RegistrationFiles files, CancellationToken ct = default);
 }
+
+// Who is submitting: the signed-in club manager and the club they act for.
+public record Submitter(int ClubId, string ClubName, string UserName);
 
 public class PlayerRegistrationService : IPlayerRegistrationService
 {
@@ -81,14 +84,16 @@ public class PlayerRegistrationService : IPlayerRegistrationService
             .Where(r => r.ClubId == clubId)
             .OrderByDescending(r => r.SubmittedAt)
             .Take(take)
+            // Details as submitted with each registration, not the player's current row.
             .Select(r => new ClubSubmission(
-                r.Id, r.Player.FirstName + " " + r.Player.LastName, r.RegistrationWindow.Category,
-                r.SubmittedAt, r.Status, r.Player.IsForeign, r.ForeignFeeRwf, r.Remarks))
+                r.Id, r.Details.FirstName + " " + r.Details.LastName, r.RegistrationWindow.Category,
+                r.SubmittedAt, r.Status, r.Details.IsForeign, r.ForeignFeeRwf, r.Remarks))
             .ToListAsync(ct);
     }
 
-    public async Task<SubmitResult> SubmitAsync(int clubId, string submittedBy, RegistrationRequest req, RegistrationFiles files, CancellationToken ct = default)
+    public async Task<SubmitResult> SubmitAsync(Submitter submitter, RegistrationRequest req, RegistrationFiles files, CancellationToken ct = default)
     {
+        var clubId = submitter.ClubId;
         var errors = new List<(string, string)>();
         var today = Today;
 
@@ -179,6 +184,17 @@ public class PlayerRegistrationService : IPlayerRegistrationService
             {
                 Player = player,
                 ClubId = clubId,
+                ClubName = submitter.ClubName,
+                Details = new PlayerDetails
+                {
+                    FirstName = player.FirstName,
+                    LastName = player.LastName,
+                    DateOfBirth = player.DateOfBirth,
+                    Nationality = player.Nationality,
+                    Phone = player.Phone,
+                    Position = player.Position,
+                    IsForeign = player.IsForeign,
+                },
                 RegistrationWindowId = window!.Id,
                 RegistrationType = req.RegistrationType,
                 PreferredShirtNumber = req.PreferredShirtNumber,
@@ -187,7 +203,7 @@ public class PlayerRegistrationService : IPlayerRegistrationService
                 ForeignFeeRwf = fee,
                 Status = RegistrationStatus.Pending,
                 SubmittedAt = now,
-                SubmittedBy = submittedBy,
+                SubmittedBy = submitter.UserName,
             };
 
             foreach (var (type, file) in new[]

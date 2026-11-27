@@ -3,7 +3,18 @@
 @{
     ViewData["Title"] = "Approval queue";
     var clubs = Model.Workspace.Registrations.Select(r => r.Club).Distinct().OrderBy(c => c).ToList();
-    var windows = Model.Workspace.Windows.Select(w => w.Category).ToList();
+    var windows = Model.Workspace.Windows.Select(w => w.Category).Distinct().ToList();
+    string StatusClass(string status) => status switch
+    {
+        "Approved" => "staff-status--approved",
+        "Rejected" => "staff-status--rejected",
+        _ => "staff-status--pending"
+    };
+}
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="alert @(Model.StatusIsError ? "alert-danger" : "alert-success")" role="status">@Model.StatusMessage</div>
 }
 
 <ul class="nav nav-tabs mb-3" id="approvalTabs" role="tablist">
@@ -89,7 +100,7 @@
                                                 </a>
                                             </td>
                                             <td>@r.Window</td>
-                                            <td><span class="staff-status staff-status--pending">@r.Status</span></td>
+                                            <td><span class="staff-status @StatusClass(r.Status)">@r.Status</span></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -115,7 +126,7 @@
                                 <h3 class="mb-0">@p.PlayerName</h3>
                                 <span class="staff-help">@p.Club · @p.Position · born @p.DateOfBirth@(p.IsForeign ? " · Foreign player" : "")</span>
                             </div>
-                            <span class="staff-status staff-status--pending">@p.Status</span>
+                            <span class="staff-status @StatusClass(p.Status)">@p.Status</span>
                         </div>
                         <div class="staff-card__body">
                             <h4 class="staff-eyebrow">Documents</h4>
@@ -156,16 +167,29 @@
                                             @if (p.FeePaid != true)
                                             {
                                                 <span class="check-list__why">Fee not yet received</span>
+                                                @if (FERW.Pages.Admin.Approvals.IndexModel.IsPending(p))
+                                                {
+                                                    <form method="post" asp-page-handler="FeePaid" asp-route-id="@p.Id" class="d-inline">
+                                                        <button type="submit" class="btn btn-sm btn-outline-primary ms-2">Mark fee received</button>
+                                                    </form>
+                                                }
                                             }
                                         </span>
                                     </li>
                                 }
                             </ul>
 
-                            <div class="d-flex flex-wrap gap-2">
-                                <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#approvePlayerModal" @(canApprove ? "" : "disabled")>Approve registration</button>
-                                <button class="btn-ffms btn-ffms-outline" type="button" data-bs-toggle="modal" data-bs-target="#rejectPlayerModal">Reject registration</button>
-                            </div>
+                            @if (FERW.Pages.Admin.Approvals.IndexModel.IsPending(p))
+                            {
+                                <div class="d-flex flex-wrap gap-2">
+                                    <button class="btn-ffms btn-ffms-green" type="button" data-bs-toggle="modal" data-bs-target="#approvePlayerModal" @(canApprove ? "" : "disabled")>Approve registration</button>
+                                    <button class="btn-ffms btn-ffms-outline" type="button" data-bs-toggle="modal" data-bs-target="#rejectPlayerModal">Reject registration</button>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="staff-help mb-0">This registration was @p.Status.ToLowerInvariant().</p>
+                            }
                         </div>
                     </article>
 
@@ -174,10 +198,10 @@
                             <div class="modal-content">
                                 <div class="modal-header"><h2 class="modal-title fs-5">Approve this registration?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
                                 <div class="modal-body"><p class="mb-0">This issues a license number for @p.PlayerName.</p></div>
-                                <div class="modal-footer">
+                                <form method="post" asp-page-handler="Approve" asp-route-id="@p.Id" class="modal-footer">
                                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Approve registration</button>
-                                </div>
+                                    <button type="submit" class="btn btn-primary">Approve registration</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -185,15 +209,17 @@
                         <div class="modal-dialog modal-dialog-centered">
                             <div class="modal-content">
                                 <div class="modal-header"><h2 class="modal-title fs-5">Reject this registration?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
-                                <div class="modal-body">
-                                    <p>@p.PlayerName and @p.Club will see this reason.</p>
-                                    <label class="form-label" for="playerRejectReason">Reason for rejection</label>
-                                    <textarea class="form-control" id="playerRejectReason" rows="3" required></textarea>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
-                                    <button type="button" class="btn btn-primary" id="confirmRejectPlayer" disabled>Reject registration</button>
-                                </div>
+                                <form method="post" asp-page-handler="Reject" asp-route-id="@p.Id">
+                                    <div class="modal-body">
+                                        <p>@p.PlayerName and @p.Club will see this reason.</p>
+                                        <label class="form-label" for="playerRejectReason">Reason for rejection</label>
+                                        <textarea class="form-control" id="playerRejectReason" name="reason" rows="3" maxlength="@FERW.Services.Players.RegistrationReviewService.MaxReasonLength" required></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="submit" class="btn btn-primary" id="confirmRejectPlayer" disabled>Reject registration</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>

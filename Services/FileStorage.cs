@@ -5,16 +5,31 @@ public interface IFileStorage
     // Saves the file under the given folder and returns its path relative to the storage root.
     Task<string> SaveAsync(IFormFile file, string folder, CancellationToken ct = default);
     void Delete(string relativePath);
+
+    // Every stored file with its last-write time, for the orphan cleanup job.
+    IEnumerable<(string RelativePath, DateTime LastWriteUtc)> ListFiles();
 }
 
-// Stores uploads under App_Data, outside wwwroot, so documents are never served publicly.
+// Stores uploads on disk, outside wwwroot, so documents are never served publicly.
+// The root comes from "Storage:UploadsPath". Outside Development it must be set to durable storage that
+// every app instance shares (for example a mounted network volume); in Development it defaults to App_Data/uploads.
 public class LocalFileStorage : IFileStorage
 {
     private readonly string _root;
 
-    public LocalFileStorage(IWebHostEnvironment env)
+    public LocalFileStorage(IWebHostEnvironment env, IConfiguration config)
     {
-        _root = Path.Combine(env.ContentRootPath, "App_Data", "uploads");
+        var configured = config["Storage:UploadsPath"];
+        if (string.IsNullOrWhiteSpace(configured))
+        {
+            if (!env.IsDevelopment())
+                throw new InvalidOperationException(
+                    "Storage:UploadsPath is not configured. Point it at durable storage shared by all app instances.");
+            configured = Path.Combine(env.ContentRootPath, "App_Data", "uploads");
+        }
+
+        _root = Path.TrimEndingDirectorySeparator(Path.GetFullPath(configured)) + Path.DirectorySeparatorChar;
+        Directory.CreateDirectory(_root);
     }
 
     public async Task<string> SaveAsync(IFormFile file, string folder, CancellationToken ct = default)
@@ -43,5 +58,14 @@ public class LocalFileStorage : IFileStorage
         var full = Path.GetFullPath(Path.Combine(_root, relativePath));
         if (full.StartsWith(_root, StringComparison.OrdinalIgnoreCase) && File.Exists(full))
             File.Delete(full);
+    }
+
+    public IEnumerable<(string RelativePath, DateTime LastWriteUtc)> ListFiles()
+    {
+        foreach (var full in Directory.EnumerateFiles(_root, "*", SearchOption.AllDirectories))
+        {
+            var relative = Path.GetRelativePath(_root, full).Replace(Path.DirectorySeparatorChar, '/');
+            yield return (relative, File.GetLastWriteTimeUtc(full));
+        }
     }
 }

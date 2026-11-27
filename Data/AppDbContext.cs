@@ -1,10 +1,12 @@
 using FERW.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace FERW.Data;
 
 // Shared database context for all modules. Add your module's DbSets and configuration here.
-public class AppDbContext : DbContext
+// Also holds the ASP.NET Core Identity tables (users, roles, claims).
+public class AppDbContext : IdentityDbContext<AppUser>
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -27,6 +29,14 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        base.OnModelCreating(b);
+
+        b.Entity<AppUser>(e =>
+        {
+            e.Property(x => x.DisplayName).HasMaxLength(100).IsRequired();
+            e.Property(x => x.ClubName).HasMaxLength(100);
+        });
+
         b.Entity<RegistrationWindow>(e =>
         {
             e.ToTable(t => t.HasCheckConstraint("CK_RegistrationWindow_Dates", "[EndDate] >= [StartDate]"));
@@ -60,6 +70,19 @@ public class AppDbContext : DbContext
             e.Property(x => x.SubmittedBy).HasMaxLength(100).IsRequired();
             e.Property(x => x.ReviewedBy).HasMaxLength(100);
             e.Property(x => x.Remarks).HasMaxLength(500);
+            e.Property(x => x.ClubName).HasMaxLength(100).IsRequired();
+            e.OwnsOne(x => x.Details, d =>
+            {
+                d.Property(x => x.FirstName).HasColumnName("PlayerFirstName").HasMaxLength(60).IsRequired();
+                d.Property(x => x.LastName).HasColumnName("PlayerLastName").HasMaxLength(60).IsRequired();
+                d.Property(x => x.DateOfBirth).HasColumnName("PlayerDateOfBirth");
+                d.Property(x => x.Nationality).HasColumnName("PlayerNationality").HasMaxLength(60).IsRequired();
+                d.Property(x => x.Phone).HasColumnName("PlayerPhone").HasMaxLength(20);
+                d.Property(x => x.Position).HasColumnName("PlayerPosition");
+                d.Property(x => x.IsForeign).HasColumnName("PlayerIsForeign");
+                d.Ignore(x => x.FullName);
+            });
+            e.Navigation(x => x.Details).IsRequired();
             e.ToTable(t =>
             {
                 t.HasCheckConstraint("CK_PlayerRegistration_Contract", "[ContractEndDate] > [ContractStartDate]");

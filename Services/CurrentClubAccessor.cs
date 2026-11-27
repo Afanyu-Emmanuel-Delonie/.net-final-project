@@ -1,23 +1,34 @@
+using System.Security.Claims;
+
 namespace FERW.Services;
 
 // Tells pages which club the signed-in club manager belongs to.
 public interface ICurrentClubAccessor
 {
     int ClubId { get; }
+    string ClubName { get; }
     string UserName { get; }
 }
 
-// Temporary: reads the club from configuration ("CurrentClub" section) until ASP.NET Identity
-// is added. Then swap in an implementation that reads the user's ClubId; pages don't change.
-public class ConfigCurrentClubAccessor : ICurrentClubAccessor
+// Reads the club from the signed-in user's claims (added by AppUserClaimsFactory), so every request
+// acts for its own user's club. Only used on pages behind the ClubManager policy, which guarantees the claims.
+public class ClaimsCurrentClubAccessor : ICurrentClubAccessor
 {
-    public ConfigCurrentClubAccessor(IConfiguration config)
+    public ClaimsCurrentClubAccessor(IHttpContextAccessor http)
     {
-        ClubId = config.GetValue<int?>("CurrentClub:ClubId")
-            ?? throw new InvalidOperationException("CurrentClub:ClubId is not configured.");
-        UserName = config.GetValue<string>("CurrentClub:UserName") ?? "club.manager";
+        var user = http.HttpContext?.User
+            ?? throw new InvalidOperationException("No current request.");
+
+        var clubId = user.FindFirstValue(AppClaims.ClubId);
+        if (!int.TryParse(clubId, out var id))
+            throw new InvalidOperationException("The signed-in user is not linked to a club.");
+
+        ClubId = id;
+        ClubName = user.FindFirstValue(AppClaims.ClubName) ?? $"Club {id}";
+        UserName = user.FindFirstValue(AppClaims.DisplayName) ?? user.Identity?.Name ?? "unknown";
     }
 
     public int ClubId { get; }
+    public string ClubName { get; }
     public string UserName { get; }
 }

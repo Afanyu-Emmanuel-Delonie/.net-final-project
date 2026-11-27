@@ -64,7 +64,8 @@ public class RegisterModel : PageModel
             Input.RegistrationWindowId!.Value, Input.ContractStartDate!.Value, Input.ContractEndDate!.Value);
         var files = new RegistrationFiles(Input.Contract, Input.MedicalReport, Input.Insurance, Input.Photo);
 
-        var result = await _registrations.SubmitAsync(_currentClub.ClubId, _currentClub.UserName, request, files, ct);
+        var submitter = new Submitter(_currentClub.ClubId, _currentClub.ClubName, _currentClub.UserName);
+        var result = await _registrations.SubmitAsync(submitter, request, files, ct);
         if (!result.Succeeded)
         {
             foreach (var (field, message) in result.Errors)
