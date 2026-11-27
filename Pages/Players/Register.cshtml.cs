@@ -12,12 +12,16 @@ public class RegisterModel : PageModel
 {
     private readonly IPlayerRegistrationService _registrations;
     private readonly ICurrentClubAccessor _currentClub;
+    private readonly LeagueTime _leagueTime;
 
-    public RegisterModel(IPlayerRegistrationService registrations, ICurrentClubAccessor currentClub)
+    public RegisterModel(IPlayerRegistrationService registrations, ICurrentClubAccessor currentClub, LeagueTime leagueTime)
     {
         _registrations = registrations;
         _currentClub = currentClub;
+        _leagueTime = leagueTime;
     }
+
+    public DateTime ToLeagueTime(DateTime utc) => _leagueTime.ToLeagueTime(utc);
 
     [BindProperty]
     public InputModel Input { get; set; } = new();

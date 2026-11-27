@@ -202,7 +202,7 @@ else
 								}
 							</td>
 							<td>@s.Category.Label()</td>
-							<td>@s.SubmittedAt.ToLocalTime().ToString("d MMM yyyy, HH:mm")</td>
+							<td>@Model.ToLeagueTime(s.SubmittedAt).ToString("d MMM yyyy, HH:mm")</td>
 							<td>@(s.ForeignFeeRwf is int fee ? $"{fee:N0} RWF" : "—")</td>
 							<td>
 								<span class="staff-status @statusClass">@s.Status</span>

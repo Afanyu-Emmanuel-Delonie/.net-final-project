@@ -229,7 +229,10 @@ namespace FERW.Data.Migrations
 
                     b.HasIndex("ClubId");
 
-                    b.HasIndex("PlayerId");
+                    b.HasIndex("PlayerId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PlayerRegistrations_PlayerId_Pending")
+                        .HasFilter("[Status] = 'Pending'");
 
                     b.HasIndex("RegistrationWindowId");
 

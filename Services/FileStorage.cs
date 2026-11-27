@@ -24,8 +24,17 @@ public class LocalFileStorage : IFileStorage
         var full = Path.Combine(_root, relative);
         Directory.CreateDirectory(Path.GetDirectoryName(full)!);
 
-        await using var stream = new FileStream(full, FileMode.CreateNew);
-        await file.CopyToAsync(stream, ct);
+        try
+        {
+            await using var stream = new FileStream(full, FileMode.CreateNew);
+            await file.CopyToAsync(stream, ct);
+        }
+        catch
+        {
+            // Don't leave a partial file behind; the caller never learns this path.
+            File.Delete(full);
+            throw;
+        }
         return relative.Replace(Path.DirectorySeparatorChar, '/');
     }
 

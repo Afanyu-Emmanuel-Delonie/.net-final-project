@@ -69,6 +69,9 @@ public class AppDbContext : DbContext
             e.HasOne(x => x.Player).WithMany(p => p.Registrations)
                 .HasForeignKey(x => x.PlayerId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(x => x.ClubId);
+            // At most one registration per player may be awaiting review, enforced atomically by the database.
+            e.HasIndex(x => x.PlayerId).IsUnique().HasFilter("[Status] = 'Pending'")
+                .HasDatabaseName("IX_PlayerRegistrations_PlayerId_Pending");
             e.HasOne(x => x.RegistrationWindow).WithMany()
                 .HasForeignKey(x => x.RegistrationWindowId).OnDelete(DeleteBehavior.Restrict);
         });

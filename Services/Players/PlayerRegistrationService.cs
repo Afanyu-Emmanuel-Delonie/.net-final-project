@@ -52,15 +52,18 @@ public class PlayerRegistrationService : IPlayerRegistrationService
     private readonly AppDbContext _db;
     private readonly IFileStorage _storage;
     private readonly TimeProvider _clock;
+    private readonly LeagueTime _leagueTime;
 
-    public PlayerRegistrationService(AppDbContext db, IFileStorage storage, TimeProvider clock)
+    public PlayerRegistrationService(AppDbContext db, IFileStorage storage, TimeProvider clock, LeagueTime leagueTime)
     {
         _db = db;
         _storage = storage;
         _clock = clock;
+        _leagueTime = leagueTime;
     }
 
-    private DateOnly Today => DateOnly.FromDateTime(_clock.GetLocalNow().DateTime);
+    // Window dates are league calendar dates, so "today" is taken in the league's time zone, not the server's.
+    private DateOnly Today => _leagueTime.Today(_clock);
 
     public async Task<IReadOnlyList<OpenWindow>> GetOpenWindowsAsync(CancellationToken ct = default)
     {
@@ -107,6 +110,12 @@ public class PlayerRegistrationService : IPlayerRegistrationService
         if (!Nationalities.All.Contains(req.Nationality))
             errors.Add((nameof(req.Nationality), "Choose a nationality from the list."));
 
+        // Model binding accepts any number for an enum, so reject values that are not declared members.
+        if (!Enum.IsDefined(req.Position))
+            errors.Add((nameof(req.Position), "Choose a position from the list."));
+        if (!Enum.IsDefined(req.RegistrationType))
+            errors.Add((nameof(req.RegistrationType), "Choose a registration type from the list."));
+
         if (req.ContractEndDate <= req.ContractStartDate)
             errors.Add((nameof(req.ContractEndDate), "Contract end date must be after the start date."));
 
@@ -116,13 +125,14 @@ public class PlayerRegistrationService : IPlayerRegistrationService
         ValidateFile(files.Insurance, nameof(files.Insurance), DocumentType.Insurance.Label(), DocumentExtensions, MaxDocumentBytes, required: true, errors);
         ValidateFile(files.Photo, nameof(files.Photo), "Photo", PhotoExtensions, MaxPhotoBytes, required: false, errors);
 
-        // A player can only have one live registration. Rejected players may be resubmitted.
         var idNumber = req.NationalIdOrPassport.Trim().ToUpperInvariant();
         var player = await _db.Players
             .Include(p => p.Registrations)
             .FirstOrDefaultAsync(p => p.NationalIdOrPassport == idNumber, ct);
-        if (player is not null && player.Registrations.Any(r => r.Status != RegistrationStatus.Rejected))
-            errors.Add((nameof(req.NationalIdOrPassport), "This player already has a pending or approved registration. Use a transfer to move a registered player."));
+        var history = player?.Registrations ?? new List<PlayerRegistration>();
+        var duplicateError = CheckRegistrationHistory(history, clubId, req.RegistrationType);
+        if (duplicateError is not null)
+            errors.Add((nameof(req.NationalIdOrPassport), duplicateError));
 
         if (errors.Count > 0)
             return new SubmitResult(null, errors);
@@ -132,13 +142,17 @@ public class PlayerRegistrationService : IPlayerRegistrationService
         int? fee = null;
         if (isForeign)
         {
+            // A missing fee rule is a configuration fault: never record a foreign registration as free.
             fee = await _db.LeagueRules
                 .Where(r => r.Key == LeagueRule.ForeignPlayerFee)
                 .Select(r => (int?)r.Value)
-                .FirstOrDefaultAsync(ct) ?? 0;
+                .FirstOrDefaultAsync(ct)
+                ?? throw new InvalidOperationException($"League rule '{LeagueRule.ForeignPlayerFee}' is not configured.");
         }
 
         var saved = new List<string>();
+        string? replacedPhoto = null;
+        int registrationId;
         var folder = $"registrations/{Guid.NewGuid():N}";
         try
         {
@@ -155,6 +169,7 @@ public class PlayerRegistrationService : IPlayerRegistrationService
 
             if (files.Photo is { Length: > 0 })
             {
+                replacedPhoto = player.PhotoPath;
                 player.PhotoPath = await _storage.SaveAsync(files.Photo, folder, ct);
                 saved.Add(player.PhotoPath);
             }
@@ -199,14 +214,56 @@ public class PlayerRegistrationService : IPlayerRegistrationService
 
             // A single SaveChanges runs in one transaction: player, registration and documents are saved together or not at all.
             await _db.SaveChangesAsync(ct);
-            return new SubmitResult(registration.Id, Array.Empty<(string, string)>());
+            registrationId = registration.Id;
+        }
+        catch (DbUpdateException ex) when (IsUniqueViolation(ex))
+        {
+            // Another submission for the same player won the race (unique national ID or one-pending-per-player index).
+            DeleteAll(saved);
+            return new SubmitResult(null, new[] { (nameof(req.NationalIdOrPassport),
+                "This player was just submitted by another request. Refresh the page to see its status.") });
         }
         catch
         {
-            foreach (var path in saved)
-                _storage.Delete(path);
+            DeleteAll(saved);
             throw;
         }
+
+        // Only remove the old photo once the new one is committed.
+        if (replacedPhoto is not null)
+            _storage.Delete(replacedPhoto);
+
+        return new SubmitResult(registrationId, Array.Empty<(string, string)>());
+    }
+
+    // New: the player must have no pending or approved registration (a registered player moves by transfer).
+    // Renewal: the player must hold an approved registration with this club and nothing already pending.
+    private static string? CheckRegistrationHistory(ICollection<PlayerRegistration> history, int clubId, RegistrationType type)
+    {
+        if (history.Any(r => r.Status == RegistrationStatus.Pending))
+            return "This player already has a registration awaiting FERWAFA review.";
+
+        var approved = history.Where(r => r.Status == RegistrationStatus.Approved).ToList();
+        return type switch
+        {
+            RegistrationType.New when approved.Count > 0 =>
+                "This player is already registered. Submit a renewal, or use a transfer to move the player to another club.",
+            RegistrationType.Renewal when approved.Count == 0 =>
+                "This player has no approved registration to renew. Submit a new registration instead.",
+            RegistrationType.Renewal when approved.MaxBy(r => r.ContractEndDate)!.ClubId != clubId =>
+                "This player is registered with another club. Use a transfer to move the player.",
+            _ => null
+        };
+    }
+
+    private static bool IsUniqueViolation(DbUpdateException ex) =>
+        // SQL Server: 2601 = duplicate key in unique index, 2627 = unique constraint violation.
+        ex.InnerException is Microsoft.Data.SqlClient.SqlException { Number: 2601 or 2627 };
+
+    private void DeleteAll(IEnumerable<string> paths)
+    {
+        foreach (var path in paths)
+            _storage.Delete(path);
     }
 
     private static void ValidateFile(IFormFile? file, string field, string label, string[] allowedExtensions,
